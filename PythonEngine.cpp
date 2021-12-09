@@ -142,7 +142,6 @@ void PythonEngine::exec(std::string_view sv) {
 
   // PyRun_SimpleString("import sys\nsys.path.append(':')\nprint(f'{sys.path}')");
   // PySys_SetPath(L"/home/julien/Software/Cpp_Swig_Ruby_Python_MCVE/build-modif/Products/python"); // Find mylib.py
-  PyRun_SimpleString("print('Hello from PythonEngine::exec')");
 
   PyObject* v = PyRun_String(command.c_str(), Py_file_input, globalDict, globalDict);
   if (v == nullptr) {

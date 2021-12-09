@@ -15,12 +15,14 @@
 #include "SpecialRunner.hpp"
 
 #include "Model.hpp"
+#include "config.hxx"
+#include <fmt/format.h>
+
+#ifdef WITHRUBY
+Test::RubyEngine ruby;
+#endif
 
 int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
-
-  #ifdef WITHRUBY
-  Test::RubyEngine ruby;
-  #endif
 
   #ifdef WITHPYTHON
   Test::PythonEngine python{argc, argv};
@@ -43,7 +45,8 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   #endif
 
   #ifdef WITHRUBY
-  ruby.exec("require '/home/julien/Software/Cpp_Swig_Ruby_Python_MCVE/ruby/test_measure.rb'");
+  const auto rubyMeasurePath = sourceDir() / "ruby/test_measure.rb";
+  ruby.exec(fmt::format("require '{}'", rubyMeasurePath.string()));
   auto ruby_measure = ruby.eval("RubyTestMeasure.new()");
   auto* ruby_measure_from_cpp = ruby.getAs<Test::Measure*>(ruby_measure);
   assert(ruby_measure_from_cpp);
@@ -51,7 +54,8 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   #endif
 
   #ifdef WITHPYTHON
-  python.exec("import sys\nsys.path.append('/home/julien/Software/Cpp_Swig_Ruby_Python_MCVE/python/')\nprint(f'{sys.path}')");
+  const auto pythonMeasurePath = sourceDir() / "python/";
+  python.exec(fmt::format("import sys\nsys.path.append('{}')\nprint(f'{{sys.path}}')", pythonMeasurePath.string()));
   python.exec("import test_measure");
   auto python_measure = python.eval("test_measure.PythonTestMeasure()");
   auto* python_measure_from_cpp = python.getAs<Test::Measure*>(python_measure);
@@ -116,5 +120,5 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
 
   std::cout << "C++: " <<  sr.get_current_model().numObjects() << " objects\n";
   printObjectNames(sr.get_current_model());
-
 }
+

@@ -1,0 +1,10 @@
+#include <filesystem>
+
+std::filesystem::path sourceDir() {
+  return "${PROJECT_SOURCE_DIR}";
+}
+
+std::filesystem::path binaryDir() {
+  return "${PROJECT_BINARY_DIR}";
+}
+

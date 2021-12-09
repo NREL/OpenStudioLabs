@@ -95,11 +95,11 @@ conan_add_remote(NAME nrel INDEX 0
   URL https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio)
 
 conan_add_remote(NAME bincrafters
-  URL https://api.bintray.com/conan/bincrafters/public-conan)
+  URL https://bincrafters.jfrog.io/artifactory/api/conan/public-conan)
 
 if(BUILD_RUBY_BINDINGS)
   # Track NREL/stable in general, on a feature branch this could be temporarily switched to NREL/testing
-  set(CONAN_RUBY "openstudio_ruby/2.7.2@nrel/testing#5cc83469365344df986cd820cca4884d")
+  set(CONAN_RUBY "openstudio_ruby/2.7.2@nrel/testing#6eb6dc4e0a3af9651279d3dc6121945a")
 endif()
 
 list(APPEND CONAN_OPTIONS "zlib:minizip=True")
@@ -108,12 +108,16 @@ list(APPEND CONAN_BUILD "missing")
 conan_cmake_run(REQUIRES
   ${CONAN_RUBY}
   "zlib/1.2.11#0df31fd24179543f5720ec7beb2a88d7"
+  "swig/4.0.2#bfafb16cd2bea6af3b8003163abcbd09"
+  "fmt/6.1.2"
+  ${CONAN_GTEST}
   BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS
   OPTIONS ${CONAN_OPTIONS}
   BUILD ${CONAN_BUILD}
   # Passes `-u, --update`    to conan install: Check updates exist from upstream remotes
   # That and build=outdated should ensure we track the right
-  # UPDATE
+  # Now that we pin dependencies, there is no point looking upstream really, so we'll save valuable configuration time by not doing it
+  UPDATE
 )
 
 message("CONAN_LIBS=${CONAN_LIBS}")
@@ -135,9 +139,12 @@ if(BUILD_RUBY_BINDINGS)
   get_target_property(RUBY_INCLUDE_DIRS CONAN_PKG::openstudio_ruby INTERFACE_INCLUDE_DIRECTORIES)
 endif()
 
-###############################################################################
 
+# ##############################################################################
+# CONFIGURE PATHS            #
+# ##############################################################################
 
+configure_file(config.hxx.in config.hxx)
 
 # Search first in the binary dir, where conan will install finders, then
 # search for modules in the root dir to override cmake ones
@@ -196,7 +203,7 @@ if(BUILD_PYTHON_BINDINGS)
   set(swig_target_name ${target_name}_python)
 
   # **Only** find static libs
-  set(Python_USE_STATIC_LIBS TRUE)
+  set(Python_USE_STATIC_LIBS FALSE)
 
   find_package(
     Python
@@ -352,6 +359,9 @@ if (BUILD_PYTHON_BINDINGS AND BUILD_RUBY_BINDINGS)
   add_executable(
     Test
     main.cpp
+    ${EMBEDDED_OUTPUT}
+    "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.cxx"
+    "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.hxx"
     ScriptEngine.hpp
     PythonEngine.hpp
     PythonEngine.cpp
@@ -373,16 +383,16 @@ if (BUILD_PYTHON_BINDINGS AND BUILD_RUBY_BINDINGS)
     ${target_name}_ruby
   )
   target_link_libraries(Test PRIVATE
-    #init_Test
     ruby_libs
     ${ALL_RUBY_BINDING_TARGETS}
     Python::Python
     ${target_name}_python
-    )
+    CONAN_PKG::fmt
+  )
 
 
   if (UNIX AND NOT APPLE)
-    target_link_libraries(additional_ruby_libs anl rt)
+    target_link_libraries(additional_ruby_libs crypt anl rt)
     target_link_libraries(Test PRIVATE "icui18n" "icuuc" "gmp")
   elseif(WIN32)
     target_link_libraries(Test PRIVATE wsock32 ws2_32 Dbghelp Shlwapi Iphlpapi)
@@ -397,26 +407,49 @@ if (BUILD_PYTHON_BINDINGS AND BUILD_RUBY_BINDINGS)
   target_include_directories(Test PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ruby_wrapper" "${CMAKE_CURRENT_BINARY_DIR}/python_wrapper"
           ${RUBY_INCLUDE_DIRS})
 elseif (BUILD_RUBY_BINDINGS)
-
   # Executable
   add_executable(
     Test
     main.cpp
+    ${EMBEDDED_OUTPUT}
+    "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.cxx"
+    "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.hxx"
     ScriptEngine.hpp
     RubyEngine.hpp
     RubyEngine.cpp
-    "${CMAKE_CURRENT_BINARY_DIR}/ruby_wrapper/SWIGRubyRuntime.hxx"
-  )
+    "${CMAKE_CURRENT_BINARY_DIR}/ruby_wrapper/SWIGRubyRuntime.hxx")
 
   target_link_libraries(Test PRIVATE ${target_name} cpp_compile_options
                                      cpp_warning_options)
-  target_link_libraries(Test PUBLIC CONAN_PKG::openstudio_ruby)
 
-  target_link_libraries(Test PRIVATE ${target_name}_ruby)
 
-  target_include_directories(Test PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ruby_wrapper"
+  add_library(additional_ruby_libs empty.cpp)
+  add_library(ruby_libs empty.cpp)
+  target_link_libraries(ruby_libs PUBLIC CONAN_PKG::openstudio_ruby)
+  target_link_libraries(ruby_libs PUBLIC additional_ruby_libs)
+
+  target_link_libraries(Test PRIVATE
+    #init_Test
+    ruby_libs
+    ${target_name}_ruby
+    )
+
+
+  if (UNIX AND NOT APPLE)
+    target_link_libraries(additional_ruby_libs crypt anl rt)
+    target_link_libraries(Test PRIVATE "icui18n" "icuuc" "gmp")
+  elseif(WIN32)
+    target_link_libraries(Test PRIVATE wsock32 ws2_32 Dbghelp Shlwapi Iphlpapi)
+    set_target_properties(Test PROPERTIES LINK_FLAGS_DEBUG "/NODEFAULTLIB:MSVCRT")
+  else()
+  endif()
+
+  if( APPLE )
+    target_link_libraries(Test PRIVATE ${COREFOUNDATION_LIBRARY})
+  endif()
+
+  target_include_directories(Test PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ruby_wrapper" "${CMAKE_CURRENT_BINARY_DIR}/python_wrapper"
           ${RUBY_INCLUDE_DIRS})
-
 elseif (BUILD_PYTHON_BINDINGS)
 
   message("Adding exe: EMBEDDED_OUTPUT=${EMBEDDED_OUTPUT}")
@@ -425,12 +458,12 @@ elseif (BUILD_PYTHON_BINDINGS)
   add_executable(
     Test
     main.cpp
-    ScriptEngine.hpp
-    PythonEngine.hpp
-    PythonEngine.cpp
     ${EMBEDDED_OUTPUT}
     "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.cxx"
     "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.hxx"
+    ScriptEngine.hpp
+    PythonEngine.hpp
+    PythonEngine.cpp
     "${CMAKE_CURRENT_BINARY_DIR}/python_wrapper/SWIGPythonRuntime.hxx"
   )
 

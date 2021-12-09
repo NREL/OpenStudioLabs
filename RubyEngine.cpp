@@ -1,4 +1,5 @@
 #include "RubyEngine.hpp"
+#include <embedded_files.hxx>
 
 #include <string>
 #include <stdexcept>
@@ -15,10 +16,16 @@
 #  pragma GCC diagnostic pop
 #endif
 
+extern "C"
+{
+  void Init_mylib(void);
+}
+
 namespace Test {
 
 RubyEngine::RubyEngine() {
   ruby_setup();
+  Init_mylib();
 }
 
 RubyEngine::~RubyEngine() {
@@ -82,3 +89,18 @@ void* RubyEngine::getAs_impl(ScriptObject& obj, const std::type_info &ti) {
 }
 
 }  // namespace Test
+
+extern "C"
+{
+  int rb_hasFile(const char* t_filename) {
+    // TODO Consider expanding this to use the path which we have artificially defined in embedded_help.rb
+    std::string expandedName = std::string(":/ruby/2.7.0/") + std::string(t_filename) + ".rb";
+    return embedded_files::hasFile(expandedName);
+  }
+
+  int rb_require_embedded(const char* t_filename) {
+    std::string require_script = R"(require ')" + std::string(t_filename) + R"(')";
+    Test::evalString(require_script);
+    return 0;
+  }
+}
