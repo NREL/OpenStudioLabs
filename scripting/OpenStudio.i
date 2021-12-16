@@ -37,15 +37,15 @@
 #endif
 
 %{
-  #include <model/ModelObject.hpp>
-  #include <model/Model.hpp>
-  #include <workflow/Runner.hpp>
-  #include <workflow/Measure.hpp>
+  #include <lib/model/ModelObject.hpp>
+  #include <lib/model/Model.hpp>
+  #include <lib/workflow/Runner.hpp>
+  #include <lib/workflow/Measure.hpp>
 %}
 
-%include <model/ModelObject.hpp>
-%include <model/Model.hpp>
-%include <workflow/Runner.hpp>
-%include <workflow/Measure.hpp>
+%include <lib/model/ModelObject.hpp>
+%include <lib/model/Model.hpp>
+%include <lib/workflow/Runner.hpp>
+%include <lib/workflow/Measure.hpp>
 
 #endif //WORKFLOW_I

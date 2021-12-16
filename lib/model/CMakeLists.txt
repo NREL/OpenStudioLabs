@@ -1,6 +1,6 @@
 # Model
 
-add_library(model SHARED
+add_library(model OBJECT
   Model.hpp
   Model.cpp
   ModelObject.hpp 

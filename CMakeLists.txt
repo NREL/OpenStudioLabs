@@ -160,8 +160,7 @@ find_package(SWIG REQUIRED COMPONENTS python ruby csharp)
 include(${SWIG_USE_FILE})
 
 add_subdirectory(embedded)
-add_subdirectory(model)
-add_subdirectory(workflow)
+add_subdirectory(lib)
 add_subdirectory(python)
 add_subdirectory(cli)
 

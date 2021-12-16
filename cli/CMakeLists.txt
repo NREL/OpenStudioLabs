@@ -1,11 +1,11 @@
 # CLI
 
 add_executable(
-  test
+  openstudio
   main.cpp
 )
 
 target_link_libraries(
-  test
-  model workflow pythonengine CONAN_PKG::fmt cpp_compile_options
+  openstudio
+  openstudiolib pythonengine CONAN_PKG::fmt cpp_compile_options
 )

@@ -1,6 +1,6 @@
 # Workflow
 
-add_library(workflow SHARED
+add_library(workflow OBJECT
   Measure.cpp
   Measure.hpp
   Runner.hpp

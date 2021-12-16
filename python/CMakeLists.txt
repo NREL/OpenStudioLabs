@@ -26,7 +26,7 @@ target_include_directories(
 
 target_link_libraries(
   pythonbindings
-  PRIVATE workflow
+  PRIVATE openstudiolib
 )
 
 #if(MSVC)
