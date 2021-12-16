@@ -152,333 +152,235 @@ configure_file(config.hxx.in config.hxx)
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}/CMake")
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
-# ##############################################################################
-# R E G U L A R    O U P U T    A N D    L I B S            #
-# ##############################################################################
-
-set(target_name mylib)
-
-set(${target_name}_src Measure.hpp Measure.cpp Model.hpp Model.cpp ModelObject.hpp ModelObject.cpp Runner.hpp
-                       SpecialRunner.hpp)
-
-add_library(${target_name} STATIC ${${target_name}_src})
-target_link_libraries(${target_name} PRIVATE cpp_warning_options
-                                             cpp_compile_options)
 
 # ##############################################################################
-# S W I G                               #
+# SWIG            #
 # ##############################################################################
-
-option(BUILD_RUBY_BINDINGS "Build Ruby bindings" ON)
-
-# Build CSharp bindings
-option(BUILD_CSHARP_BINDINGS "Build CSharp bindings" OFF)
-
-# Build Python bindings Requires: SWIG Python
-option(BUILD_PYTHON_BINDINGS "Build Python bindings" ON)
-
-# lib swig files
-set(${target_name}_swig_src Measure.i)
-
-foreach(SWIG_FILE ${${target_name}_swig_src})
-  message("SWIG_FILE=${SWIG_FILE}")
-  set_source_files_properties(${SWIG_FILE} PROPERTIES CPLUSPLUS ON)
-endforeach()
-
 find_package(SWIG REQUIRED COMPONENTS python ruby csharp)
-message("${SWIG_USE_FILE}")
 include(${SWIG_USE_FILE})
 
-enable_testing()
-include(CTest)
-
-# TODO: WE DO NEED TO EMBED STUFF, SO PUT THAT BACK!
-include("embedded/EmbedFiles.cmake")
-add_subdirectory("embedded")
-
-if(BUILD_PYTHON_BINDINGS)
-
-  add_compile_definitions(WITHPYTHON)
-
-  set(swig_target_name ${target_name}_python)
-
-  # **Only** find static libs
-  set(Python_USE_STATIC_LIBS FALSE)
-
-  find_package(
-    Python
-    COMPONENTS Interpreter Development
-    REQUIRED)
-
-  swig_add_library(
-    ${swig_target_name}
-    TYPE STATIC
-    LANGUAGE python OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/Products/python"
-                    OUTFILE_DIR "${CMAKE_CURRENT_BINARY_DIR}/python_wrapper"
-    SOURCES ${${target_name}_swig_src})
-
-  set_target_properties(${swig_target_name} PROPERTIES OUTPUT_NAME
-                                                       ${target_name})
-
-  set_target_properties(
-    ${swig_target_name} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY
-                                   "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/python/")
-  set_target_properties(
-    ${swig_target_name} PROPERTIES LIBRARY_OUTPUT_DIRECTORY
-                                   "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/python/")
-  set_target_properties(
-    ${swig_target_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
-                                   "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/python/")
-
-#  target_include_directories(${swig_target_name} PRIVATE SYSTEM
-#                                                         ${Python_INCLUDE_DIRS})
-
-  swig_link_libraries(${swig_target_name} PUBLIC ${target_name} PRIVATE
-                      cpp_compile_options)
-
-#  if(MSVC)
-    swig_link_libraries(${swig_target_name} PRIVATE Python::Module)
-#  endif()
-
-  add_test(
-    NAME test_python_only
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python
-    COMMAND ${Python_EXECUTABLE} test_python_only.rb)
-
-  # Must call CMake itself in order to set the SWIG_LIB env var for
-  # add_custom_command
-  add_custom_command(
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/python_wrapper/SWIGPythonRuntime.hxx"
-    COMMAND
-      ${CMAKE_COMMAND} -E env SWIG_LIB="${SWIG_DIR}" "${SWIG_EXECUTABLE}" "-v"
-      "-python" -external-runtime
-      "${CMAKE_CURRENT_BINARY_DIR}/python_wrapper/SWIGPythonRuntime.hxx")
-
-  message("Searching for python modules in '${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/python/*.py'")
-  file(GLOB_RECURSE  EXTENSION_PY  FOLLOW_SYMLINKS "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/python/*.py")
-
-  # Temporarily set it here, otherwise it doesn't exist when CMake is run the first time... Should add a DEPENDS variable to embed_files...
-  set (EXTENSION_PY "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/python/mylib.py")
-  message("EXTENSION_PY=${EXTENSION_PY}")
-  foreach( _FILE ${EXTENSION_PY} )
-    file(RELATIVE_PATH LOCATION ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY} ${_FILE})
-    list(APPEND FILES ${_FILE})
-    list(APPEND EMBEDDED_PATHS ${LOCATION})
-  endforeach()
-  message("FILES=${FILES}")
-  message("EMBEDDED_PATHS=${EMBEDDED_PATHS}")
-
-  embed_files("${FILES}" "${EMBEDDED_PATHS}" EMBEDDED_OUTPUT)
-
-  set_source_files_properties(${EMBED_SOURCE_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
-
-  source_group(embedded_files FILES ${EMBEDDED_OUTPUT})
-
-  message("EMBEDDED_OUTPUT=${EMBEDDED_OUTPUT}")
-
-endif()
-
-if(BUILD_RUBY_BINDINGS)
-
-  add_compile_definitions(WITHRUBY)
-  add_compile_definitions(RUBY_EMBEDDED)
-  set(swig_target_name ${target_name}_ruby)
-
-  swig_add_library(
-    ${swig_target_name}
-    TYPE STATIC
-    LANGUAGE ruby OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/Products/ruby"
-                  OUTFILE_DIR "${CMAKE_CURRENT_BINARY_DIR}/ruby_wrapper"
-    SOURCES ${${target_name}_swig_src})
-
-  set_target_properties(${swig_target_name} PROPERTIES OUTPUT_NAME
-                                                       ${target_name})
-
-  set_target_properties(
-    ${swig_target_name} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY
-                                   "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/ruby/")
-  set_target_properties(
-    ${swig_target_name} PROPERTIES LIBRARY_OUTPUT_DIRECTORY
-                                   "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/ruby/")
-  set_target_properties(
-    ${swig_target_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
-                                   "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ruby/")
-
-  target_include_directories(
-    ${swig_target_name} PRIVATE SYSTEM ${RUBY_INCLUDE_DIRS} )
-
-  swig_link_libraries(${swig_target_name} PUBLIC ${target_name} PRIVATE
-                      ${RUBY_LIBRARIES} cpp_compile_options)
-
-  add_test(
-    NAME test_ruby_only
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ruby
-    COMMAND ${RUBY_EXECUTABLE} test_ruby_only.py)
-
-
-  # Must call CMake itself in order to set the SWIG_LIB env var for
-  # add_custom_command
-  add_custom_command(
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ruby_wrapper/SWIGRubyRuntime.hxx"
-    COMMAND
-      ${CMAKE_COMMAND} -E env SWIG_LIB="${SWIG_DIR}" "${SWIG_EXECUTABLE}" "-v"
-      "-ruby" -external-runtime
-      "${CMAKE_CURRENT_BINARY_DIR}/ruby_wrapper/SWIGRubyRuntime.hxx")
-
-  set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/ruby_wrapper/SWIGRubyRuntime.hxx" PROPERTIES COMPILE_FLAGS "-DRUBY_EMBEDDED -Wno-unused-variable" )
-
-endif()
-
-if(BUILD_RUBY_BINDINGS AND BUILD_PYTHON_BINDINGS)
-
-  add_test(
-    NAME test_pycall
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ruby
-    COMMAND ${RUBY_EXECUTABLE} test_pycall.rb)
-
-  add_test(
-    NAME test_pycall_workaround
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ruby
-    COMMAND ${RUBY_EXECUTABLE} test_pycall_workaround.rb)
-
-  add_test(
-    NAME test_pycall_use_cpp_to_convert_pointers
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ruby
-    COMMAND ${RUBY_EXECUTABLE} test_pycall_use_cpp_to_convert_pointers.rb)
-
-  add_test(
-    NAME test_pycall_script
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ruby
-    COMMAND ${RUBY_EXECUTABLE} test_pycall_script.rb)
-
-endif()
-
-if (BUILD_PYTHON_BINDINGS AND BUILD_RUBY_BINDINGS)
-
-  # Executable
-  add_executable(
-    Test
-    main.cpp
-    ${EMBEDDED_OUTPUT}
-    "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.cxx"
-    "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.hxx"
-    ScriptEngine.hpp
-    PythonEngine.hpp
-    PythonEngine.cpp
-    RubyEngine.hpp
-    RubyEngine.cpp
-    "${CMAKE_CURRENT_BINARY_DIR}/ruby_wrapper/SWIGRubyRuntime.hxx"
-    "${CMAKE_CURRENT_BINARY_DIR}/python_wrapper/SWIGPythonRuntime.hxx")
-
-  target_link_libraries(Test PRIVATE ${target_name} cpp_compile_options
-                                     cpp_warning_options)
-
-
-  add_library(additional_ruby_libs empty.cpp)
-  add_library(ruby_libs empty.cpp)
-  target_link_libraries(ruby_libs PUBLIC CONAN_PKG::openstudio_ruby)
-  target_link_libraries(ruby_libs PUBLIC additional_ruby_libs)
-
-  set(ALL_RUBY_BINDING_TARGETS
-    ${target_name}_ruby
-  )
-  target_link_libraries(Test PRIVATE
-    ruby_libs
-    ${ALL_RUBY_BINDING_TARGETS}
-    Python::Python
-    ${target_name}_python
-    CONAN_PKG::fmt
-  )
-
-
-  if (UNIX AND NOT APPLE)
-    target_link_libraries(additional_ruby_libs crypt anl rt)
-    target_link_libraries(Test PRIVATE "icui18n" "icuuc" "gmp")
-  elseif(WIN32)
-    target_link_libraries(Test PRIVATE wsock32 ws2_32 Dbghelp Shlwapi Iphlpapi)
-    set_target_properties(Test PROPERTIES LINK_FLAGS_DEBUG "/NODEFAULTLIB:MSVCRT")
-  else()
-  endif()
-
-  if( APPLE )
-    target_link_libraries(Test PRIVATE ${COREFOUNDATION_LIBRARY})
-  endif()
-
-  target_include_directories(Test PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ruby_wrapper" "${CMAKE_CURRENT_BINARY_DIR}/python_wrapper"
-          ${RUBY_INCLUDE_DIRS})
-elseif (BUILD_RUBY_BINDINGS)
-  # Executable
-  add_executable(
-    Test
-    main.cpp
-    ${EMBEDDED_OUTPUT}
-    "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.cxx"
-    "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.hxx"
-    ScriptEngine.hpp
-    RubyEngine.hpp
-    RubyEngine.cpp
-    "${CMAKE_CURRENT_BINARY_DIR}/ruby_wrapper/SWIGRubyRuntime.hxx")
-
-  target_link_libraries(Test PRIVATE ${target_name} cpp_compile_options
-                                     cpp_warning_options)
-
-
-  add_library(additional_ruby_libs empty.cpp)
-  add_library(ruby_libs empty.cpp)
-  target_link_libraries(ruby_libs PUBLIC CONAN_PKG::openstudio_ruby)
-  target_link_libraries(ruby_libs PUBLIC additional_ruby_libs)
-
-  target_link_libraries(Test PRIVATE
-    #init_Test
-    ruby_libs
-    ${target_name}_ruby
-    )
-
-
-  if (UNIX AND NOT APPLE)
-    target_link_libraries(additional_ruby_libs crypt anl rt)
-    target_link_libraries(Test PRIVATE "icui18n" "icuuc" "gmp")
-  elseif(WIN32)
-    target_link_libraries(Test PRIVATE wsock32 ws2_32 Dbghelp Shlwapi Iphlpapi)
-    set_target_properties(Test PROPERTIES LINK_FLAGS_DEBUG "/NODEFAULTLIB:MSVCRT")
-  else()
-  endif()
-
-  if( APPLE )
-    target_link_libraries(Test PRIVATE ${COREFOUNDATION_LIBRARY})
-  endif()
-
-  target_include_directories(Test PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ruby_wrapper" "${CMAKE_CURRENT_BINARY_DIR}/python_wrapper"
-          ${RUBY_INCLUDE_DIRS})
-elseif (BUILD_PYTHON_BINDINGS)
-
-  message("Adding exe: EMBEDDED_OUTPUT=${EMBEDDED_OUTPUT}")
-
-  # Executable
-  add_executable(
-    Test
-    main.cpp
-    ${EMBEDDED_OUTPUT}
-    "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.cxx"
-    "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.hxx"
-    ScriptEngine.hpp
-    PythonEngine.hpp
-    PythonEngine.cpp
-    "${CMAKE_CURRENT_BINARY_DIR}/python_wrapper/SWIGPythonRuntime.hxx"
-  )
-
-  target_link_libraries(Test PRIVATE ${target_name} cpp_compile_options
-                                     cpp_warning_options)
-
-  target_link_libraries(Test PRIVATE
-    Python::Python
-    ${target_name}_python
-    CONAN_PKG::zlib
-  )
-
-  set_target_properties(Test  PROPERTIES LINK_FLAGS "-Xlinker --export-dynamic")
-  message("Python_LINK_OPTIONS=${Python_LINK_OPTIONS}")
-
-  target_include_directories(Test PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/python_wrapper")
-
-endif()
+add_subdirectory(embedded)
+add_subdirectory(model)
+add_subdirectory(workflow)
+add_subdirectory(python)
+add_subdirectory(cli)
+
+####------------# ##############################################################################
+####------------# R E G U L A R    O U P U T    A N D    L I B S            #
+####------------# ##############################################################################
+####------------
+####------------set(target_name mylib)
+####------------
+####------------set(${target_name}_src Measure.hpp Measure.cpp Model.hpp Model.cpp ModelObject.hpp ModelObject.cpp Runner.hpp
+####------------                       SpecialRunner.hpp)
+####------------
+####------------add_library(${target_name} STATIC ${${target_name}_src})
+####------------target_link_libraries(${target_name} PRIVATE cpp_warning_options
+####------------                                             cpp_compile_options)
+####------------
+####------------# ##############################################################################
+####------------# S W I G                               #
+####------------# ##############################################################################
+####------------
+####------------option(BUILD_RUBY_BINDINGS "Build Ruby bindings" ON)
+####------------
+####------------# Build CSharp bindings
+####------------option(BUILD_CSHARP_BINDINGS "Build CSharp bindings" OFF)
+####------------
+####------------# Build Python bindings Requires: SWIG Python
+####------------option(BUILD_PYTHON_BINDINGS "Build Python bindings" ON)
+####------------
+####------------# lib swig files
+####------------set(${target_name}_swig_src Measure.i)
+####------------
+####------------foreach(SWIG_FILE ${${target_name}_swig_src})
+####------------  message("SWIG_FILE=${SWIG_FILE}")
+####------------  set_source_files_properties(${SWIG_FILE} PROPERTIES CPLUSPLUS ON)
+####------------endforeach()
+####------------
+####------------find_package(SWIG REQUIRED COMPONENTS python ruby csharp)
+####------------message("${SWIG_USE_FILE}")
+####------------include(${SWIG_USE_FILE})
+####------------
+####------------enable_testing()
+####------------include(CTest)
+####------------
+####------------# TODO: WE DO NEED TO EMBED STUFF, SO PUT THAT BACK!
+####------------include("embedded/EmbedFiles.cmake")
+####------------add_subdirectory("embedded")
+####------------
+####------------if(BUILD_PYTHON_BINDINGS)
+####------------
+####------------  add_compile_definitions(WITHPYTHON)
+####------------
+####------------  set(swig_target_name ${target_name}_python)
+####------------
+####------------  # **Only** find static libs
+####------------  set(Python_USE_STATIC_LIBS FALSE)
+####------------
+####------------  find_package(
+####------------    Python
+####------------    COMPONENTS Interpreter Development
+####------------    REQUIRED)
+####------------
+####------------  swig_add_library(
+####------------    ${swig_target_name}
+####------------    TYPE STATIC
+####------------    LANGUAGE python OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/Products/python"
+####------------                    OUTFILE_DIR "${CMAKE_CURRENT_BINARY_DIR}/python_wrapper"
+####------------    SOURCES ${${target_name}_swig_src})
+####------------
+####------------  set_target_properties(${swig_target_name} PROPERTIES OUTPUT_NAME
+####------------                                                       ${target_name})
+####------------
+####------------  set_target_properties(
+####------------    ${swig_target_name} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY
+####------------                                   "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/python/")
+####------------  set_target_properties(
+####------------    ${swig_target_name} PROPERTIES LIBRARY_OUTPUT_DIRECTORY
+####------------                                   "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/python/")
+####------------  set_target_properties(
+####------------    ${swig_target_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
+####------------                                   "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/python/")
+####------------
+####------------#  target_include_directories(${swig_target_name} PRIVATE SYSTEM
+####------------#                                                         ${Python_INCLUDE_DIRS})
+####------------
+####------------  swig_link_libraries(${swig_target_name} PUBLIC ${target_name} PRIVATE
+####------------                      cpp_compile_options)
+####------------
+####------------#  if(MSVC)
+####------------    swig_link_libraries(${swig_target_name} PRIVATE Python::Module)
+####------------#  endif()
+####------------
+####------------  # Must call CMake itself in order to set the SWIG_LIB env var for
+####------------  # add_custom_command
+####------------  add_custom_command(
+####------------    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/python_wrapper/SWIGPythonRuntime.hxx"
+####------------    COMMAND
+####------------      ${CMAKE_COMMAND} -E env SWIG_LIB="${SWIG_DIR}" "${SWIG_EXECUTABLE}" "-v"
+####------------      "-python" -external-runtime
+####------------      "${CMAKE_CURRENT_BINARY_DIR}/python_wrapper/SWIGPythonRuntime.hxx")
+####------------
+####------------  message("Searching for python modules in '${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/python/*.py'")
+####------------  file(GLOB_RECURSE  EXTENSION_PY  FOLLOW_SYMLINKS "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/python/*.py")
+####------------
+####------------  # Temporarily set it here, otherwise it doesn't exist when CMake is run the first time... Should add a DEPENDS variable to embed_files...
+####------------  set (EXTENSION_PY "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/python/mylib.py")
+####------------  message("EXTENSION_PY=${EXTENSION_PY}")
+####------------  foreach( _FILE ${EXTENSION_PY} )
+####------------    file(RELATIVE_PATH LOCATION ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY} ${_FILE})
+####------------    list(APPEND FILES ${_FILE})
+####------------    list(APPEND EMBEDDED_PATHS ${LOCATION})
+####------------  endforeach()
+####------------  message("FILES=${FILES}")
+####------------  message("EMBEDDED_PATHS=${EMBEDDED_PATHS}")
+####------------
+####------------  embed_files("${FILES}" "${EMBEDDED_PATHS}" EMBEDDED_OUTPUT)
+####------------
+####------------  set_source_files_properties(${EMBED_SOURCE_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
+####------------
+####------------  source_group(embedded_files FILES ${EMBEDDED_OUTPUT})
+####------------
+####------------  message("EMBEDDED_OUTPUT=${EMBEDDED_OUTPUT}")
+####------------
+####------------endif()
+####------------
+####------------if(BUILD_RUBY_BINDINGS)
+####------------
+####------------  add_compile_definitions(WITHRUBY)
+####------------  add_compile_definitions(RUBY_EMBEDDED)
+####------------  set(swig_target_name ${target_name}_ruby)
+####------------
+####------------  swig_add_library(
+####------------    ${swig_target_name}
+####------------    TYPE STATIC
+####------------    LANGUAGE ruby OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/Products/ruby"
+####------------                  OUTFILE_DIR "${CMAKE_CURRENT_BINARY_DIR}/ruby_wrapper"
+####------------    SOURCES ${${target_name}_swig_src})
+####------------
+####------------  set_target_properties(${swig_target_name} PROPERTIES OUTPUT_NAME
+####------------                                                       ${target_name})
+####------------
+####------------  set_target_properties(
+####------------    ${swig_target_name} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY
+####------------                                   "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/ruby/")
+####------------  set_target_properties(
+####------------    ${swig_target_name} PROPERTIES LIBRARY_OUTPUT_DIRECTORY
+####------------                                   "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/ruby/")
+####------------  set_target_properties(
+####------------    ${swig_target_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
+####------------                                   "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ruby/")
+####------------
+####------------  target_include_directories(
+####------------    ${swig_target_name} PRIVATE SYSTEM ${RUBY_INCLUDE_DIRS} )
+####------------
+####------------  swig_link_libraries(${swig_target_name} PUBLIC ${target_name} PRIVATE
+####------------                      ${RUBY_LIBRARIES} cpp_compile_options)
+####------------
+####------------  # Must call CMake itself in order to set the SWIG_LIB env var for
+####------------  # add_custom_command
+####------------  add_custom_command(
+####------------    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ruby_wrapper/SWIGRubyRuntime.hxx"
+####------------    COMMAND
+####------------      ${CMAKE_COMMAND} -E env SWIG_LIB="${SWIG_DIR}" "${SWIG_EXECUTABLE}" "-v"
+####------------      "-ruby" -external-runtime
+####------------      "${CMAKE_CURRENT_BINARY_DIR}/ruby_wrapper/SWIGRubyRuntime.hxx")
+####------------
+####------------  set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/ruby_wrapper/SWIGRubyRuntime.hxx" PROPERTIES COMPILE_FLAGS "-DRUBY_EMBEDDED -Wno-unused-variable" )
+####------------
+####------------endif()
+####------------
+####------------if(BUILD_RUBY_BINDINGS AND BUILD_PYTHON_BINDINGS)
+####------------  # Executable
+####------------  add_executable(
+####------------    Test
+####------------    main.cpp
+####------------    ${EMBEDDED_OUTPUT}
+####------------    "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.cxx"
+####------------    "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.hxx"
+####------------    ScriptEngine.hpp
+####------------    PythonEngine.hpp
+####------------    PythonEngine.cpp
+####------------    RubyEngine.hpp
+####------------    RubyEngine.cpp
+####------------    "${CMAKE_CURRENT_BINARY_DIR}/ruby_wrapper/SWIGRubyRuntime.hxx"
+####------------    "${CMAKE_CURRENT_BINARY_DIR}/python_wrapper/SWIGPythonRuntime.hxx")
+####------------
+####------------  target_link_libraries(Test PRIVATE ${target_name} cpp_compile_options
+####------------                                     cpp_warning_options)
+####------------
+####------------
+####------------  add_library(additional_ruby_libs empty.cpp)
+####------------  add_library(ruby_libs empty.cpp)
+####------------  target_link_libraries(ruby_libs PUBLIC CONAN_PKG::openstudio_ruby)
+####------------  target_link_libraries(ruby_libs PUBLIC additional_ruby_libs)
+####------------
+####------------  set(ALL_RUBY_BINDING_TARGETS
+####------------    ${target_name}_ruby
+####------------  )
+####------------  target_link_libraries(Test PRIVATE
+####------------    ruby_libs
+####------------    ${ALL_RUBY_BINDING_TARGETS}
+####------------    Python::Python
+####------------    ${target_name}_python
+####------------    CONAN_PKG::fmt
+####------------  )
+####------------
+####------------
+####------------  if (UNIX AND NOT APPLE)
+####------------    target_link_libraries(additional_ruby_libs crypt anl rt)
+####------------    target_link_libraries(Test PRIVATE "icui18n" "icuuc" "gmp")
+####------------  elseif(WIN32)
+####------------    target_link_libraries(Test PRIVATE wsock32 ws2_32 Dbghelp Shlwapi Iphlpapi)
+####------------    set_target_properties(Test PROPERTIES LINK_FLAGS_DEBUG "/NODEFAULTLIB:MSVCRT")
+####------------  else()
+####------------  endif()
+####------------
+####------------  if( APPLE )
+####------------    target_link_libraries(Test PRIVATE ${COREFOUNDATION_LIBRARY})
+####------------  endif()
+####------------
+####------------  target_include_directories(Test PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ruby_wrapper" "${CMAKE_CURRENT_BINARY_DIR}/python_wrapper"
+####------------          ${RUBY_INCLUDE_DIRS})
+####------------endif()

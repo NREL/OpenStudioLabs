@@ -1,7 +1,7 @@
 #ifndef PYTHONENGINE_included
 #define PYTHONENGINE_included
 
-#include "ScriptEngine.hpp"
+#include "../../scripting/ScriptEngine.hpp"
 
 namespace Test {
 class PythonEngine final : public ScriptEngine

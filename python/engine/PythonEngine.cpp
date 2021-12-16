@@ -10,7 +10,7 @@
 
 #include <Python.h>
 //#include "SWIGPythonRuntime.hxx"
-#include "MeasurePYTHON_wrap.cxx"
+#include "OpenStudioPYTHON_wrap.cxx"
 #include "embedded_files.hxx"
 #ifdef __GNUC__
 #  pragma GCC diagnostic pop
@@ -24,7 +24,7 @@ PythonEngine::PythonEngine([[maybe_unused]] const int argc, const char* argv[]) 
     exit(1);
   }
 
-  PyImport_AppendInittab("_mylib", PyInit__mylib);
+  PyImport_AppendInittab("_pythonbindings", SWIG_init);
 
   Py_SetProgramName(program);  // optional but recommended
 

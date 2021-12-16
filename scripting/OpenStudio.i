@@ -1,5 +1,5 @@
-#ifndef MEASURE_I
-#define MEASURE_I
+#ifndef WORKFLOW_I
+#define WORKFLOW_I
 
 #include <stl.i>
 
@@ -26,8 +26,6 @@
 %module mylib
 %module(directors="1") mylib
 
-
-
 %include <stl.i>
 %include <std_string.i>
 %include <std_vector.i>
@@ -36,20 +34,18 @@
 
 #if defined(SWIGPYTHON)
 %rename (PythonMeasure) Test::Measure;
-//%rename ("Python%s") "";
 #endif
 
 %{
-  #include <ModelObject.hpp>
-  #include <Model.hpp>
-  #include <Runner.hpp>
-  #include <Measure.hpp>
+  #include <model/ModelObject.hpp>
+  #include <model/Model.hpp>
+  #include <workflow/Runner.hpp>
+  #include <workflow/Measure.hpp>
 %}
 
-%include <ModelObject.hpp>
-%include <Model.hpp>
-%include <Runner.hpp>
-%include <Measure.hpp>
+%include <model/ModelObject.hpp>
+%include <model/Model.hpp>
+%include <workflow/Runner.hpp>
+%include <workflow/Measure.hpp>
 
-#endif //MEASURE_I
-
+#endif //WORKFLOW_I
