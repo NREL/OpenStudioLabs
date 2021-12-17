@@ -16,7 +16,7 @@
 #  pragma GCC diagnostic pop
 #endif
 
-namespace Test {
+namespace openstudio {
 
 PythonEngine::PythonEngine([[maybe_unused]] const int argc, const char* argv[]) : program(Py_DecodeLocale(argv[0], nullptr)) {
   if (program == nullptr) {

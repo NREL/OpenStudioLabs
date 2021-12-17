@@ -1,9 +1,17 @@
 cmake_minimum_required(VERSION 3.17.5)
 
+project(test_swig VERSION 0.0.1)
+
 add_library(cpp_warning_options INTERFACE)
 add_library(cpp_compile_options INTERFACE)
 
 target_compile_features(cpp_compile_options INTERFACE cxx_std_17)
+
+include(CheckIncludeFile)
+check_include_file("unistd.h" HAVE_UNISTD_H)
+if(HAVE_UNISTD_H)
+  target_compile_definitions(cpp_compile_options INTERFACE "-DHAVE_UNISTD_H")
+endif()
 
 if(MSVC)
   target_compile_options(cpp_warning_options INTERFACE /W4 /Werror)
@@ -26,8 +34,6 @@ if(CCACHE_PROGRAM)
   # Support Unix Makefiles and Ninja
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
-
-project(test_swig VERSION 0.0.1)
 
 # Set a default build type if none was specified
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)

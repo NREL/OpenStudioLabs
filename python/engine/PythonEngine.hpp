@@ -1,9 +1,10 @@
 #ifndef PYTHONENGINE_included
 #define PYTHONENGINE_included
 
+#include <memory>
 #include "../../scripting/ScriptEngine.hpp"
 
-namespace Test {
+namespace openstudio {
 class PythonEngine final : public ScriptEngine
 {
  public:
@@ -26,6 +27,13 @@ class PythonEngine final : public ScriptEngine
  private:
   wchar_t* program;
 };
+
 }  // namespace Test
+
+extern "C" {
+openstudio::ScriptEngine* makeScriptEngine(const int argc, const char* argv[]) {
+  return new openstudio::PythonEngine(argc, argv);
+}
+}
 
 #endif

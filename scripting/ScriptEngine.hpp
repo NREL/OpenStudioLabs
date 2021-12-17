@@ -9,7 +9,7 @@
 #include <string>
 #include <stdexcept>
 
-namespace Test {
+namespace openstudio {
 struct ScriptObject
 {
   std::any object;
@@ -72,5 +72,7 @@ class ScriptEngine
 };
 
 }  // namespace Test
+
+typedef openstudio::ScriptEngine* ScriptEngineFactoryType (const int argc, const char* argv[]);
 
 #endif

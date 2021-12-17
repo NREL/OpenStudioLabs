@@ -1,4 +1,4 @@
-# CLI
+# CLItest
 
 add_executable(
   openstudio
