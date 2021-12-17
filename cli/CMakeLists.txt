@@ -7,5 +7,5 @@ add_executable(
 
 target_link_libraries(
   openstudio
-  openstudiolib pythonengine CONAN_PKG::fmt cpp_compile_options
+  openstudiolib CONAN_PKG::fmt cpp_compile_options
 )
