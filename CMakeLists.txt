@@ -93,19 +93,29 @@ endif()
 
 include(${CMAKE_BINARY_DIR}/conan.cmake)
 
-conan_check(VERSION 1.21.0 REQUIRED)
+conan_check(VERSION 1.28.0 REQUIRED)
 
-message(STATUS "RUNNING CONAN")
+message(STATUS "openstudio: RUNNING CONAN")
 
+# Add NREL remote and place it first in line, since we vendored dependencies to NREL's repo, they will be picked first
+# TJC 2021-04-27 bintray.com is decommissioned as of 2021-05-01. See commercialbuildings as replacement below.
 conan_add_remote(NAME nrel INDEX 0
-  URL https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio)
+   URL https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio)
 
 conan_add_remote(NAME bincrafters
   URL https://bincrafters.jfrog.io/artifactory/api/conan/public-conan)
 
-if(BUILD_RUBY_BINDINGS)
-  # Track NREL/stable in general, on a feature branch this could be temporarily switched to NREL/testing
-  set(CONAN_RUBY "openstudio_ruby/2.7.2@nrel/testing#6eb6dc4e0a3af9651279d3dc6121945a")
+# Enable revisions in conan: check if they are already enabled, if not do it and warn user
+execute_process(
+  COMMAND ${CONAN_CMD} config get general.revisions_enabled
+  OUTPUT_VARIABLE CONAN_REV_STATUS
+  ERROR_VARIABLE CONAN_REV_STATUS
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+message(STATUS "Conan: config get general.revisions_enabled=${CONAN_REV_STATUS}")
+if (NOT "${CONAN_REV_STATUS}" STREQUAL "True")
+  message(AUTHOR_WARNING "Conan: Force enabling revisions (conan config set general.revisions_enabled=True)")
+  execute_process(COMMAND ${CONAN_CMD} config set general.revisions_enabled=True)
 endif()
 
 list(APPEND CONAN_OPTIONS "zlib:minizip=True")
