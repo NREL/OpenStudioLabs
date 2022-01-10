@@ -3,7 +3,7 @@
 add_subdirectory(model)
 add_subdirectory(workflow)
 
-add_library(openstudiolib SHARED
+add_library(openstudiolib STATIC
   empty.cpp
 )
 

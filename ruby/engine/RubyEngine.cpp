@@ -1,6 +1,8 @@
 #include "RubyEngine.hpp"
-#include <embedded_files.hxx>
-
+#include "Init.hpp"
+#include "ruby.h"
+#include <signal.h>
+#include <time.h>
 #include <string>
 #include <stdexcept>
 
@@ -9,23 +11,16 @@
 #  pragma GCC diagnostic ignored "-Wregister"
 #  pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
-
 #include "SWIGRubyRuntime.hxx"
 
 #ifdef __GNUC__
 #  pragma GCC diagnostic pop
 #endif
 
-extern "C"
-{
-  void Init_mylib(void);
-}
-
-namespace Test {
+namespace openstudio {
 
 RubyEngine::RubyEngine() {
-  ruby_setup();
-  Init_mylib();
+  openstudio::ruby::init();
 }
 
 RubyEngine::~RubyEngine() {
@@ -36,7 +31,7 @@ static VALUE evaluateSimpleImpl(VALUE arg) {
   return rb_eval_string(StringValuePtr(arg));
 }
 
-VALUE evalString(const std::string& t_str) {
+int evalString(const std::string& t_str) {
   VALUE val = rb_str_new2(t_str.c_str());
   int error;
   // save and restore the current working directory in case the call to ruby upsets it
@@ -52,6 +47,7 @@ VALUE evalString(const std::string& t_str) {
   }
 
   return result;
+  //return 0;
 }
 
 ScriptObject RubyEngine::eval(std::string_view sv) {
@@ -88,19 +84,25 @@ void* RubyEngine::getAs_impl(ScriptObject& obj, const std::type_info &ti) {
   return return_value;
 }
 
-}  // namespace Test
+} // namespace openstudio
 
-extern "C"
-{
-  int rb_hasFile(const char* t_filename) {
-    // TODO Consider expanding this to use the path which we have artificially defined in embedded_help.rb
-    std::string expandedName = std::string(":/ruby/2.7.0/") + std::string(t_filename) + ".rb";
-    return embedded_files::hasFile(expandedName);
-  }
-
-  int rb_require_embedded(const char* t_filename) {
-    std::string require_script = R"(require ')" + std::string(t_filename) + R"(')";
-    Test::evalString(require_script);
-    return 0;
-  }
+extern "C" {
+openstudio::ScriptEngine* makeScriptEngine([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
+  return new openstudio::RubyEngine();
 }
+}
+
+//extern "C"
+//{
+//  int rb_hasFile(const char* t_filename) {
+//    // TODO Consider expanding this to use the path which we have artificially defined in embedded_help.rb
+//    std::string expandedName = std::string(":/ruby/2.7.0/") + std::string(t_filename) + ".rb";
+//    return embedded_files::hasFile(expandedName);
+//  }
+//
+//  int rb_require_embedded(const char* t_filename) {
+//    std::string require_script = R"(require ')" + std::string(t_filename) + R"(')";
+//    Test::evalString(require_script);
+//    return 0;
+//  }
+//}

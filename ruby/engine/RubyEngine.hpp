@@ -1,9 +1,10 @@
 #ifndef RUBYENGINE_included
 #define RUBYENGINE_included
 
-#include "ScriptEngine.hpp"
+#include "../../scripting/ScriptEngine.hpp"
 
-namespace Test {
+namespace openstudio {
+
 class RubyEngine final : public ScriptEngine
 {
  public:
@@ -23,6 +24,7 @@ class RubyEngine final : public ScriptEngine
   // so the above template function can provide it back to the caller.
   void* getAs_impl(ScriptObject& obj, const std::type_info&) override;
 };
-}  // namespace Test
+
+} // namespace openstudio
 
 #endif

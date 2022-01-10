@@ -14,30 +14,27 @@
 
 int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   
-  openstudio::util::DynamicLibrary pythonEngineLib("libpythonengine.so");
-  std::function<ScriptEngineFactoryType> factory = pythonEngineLib.load_symbol<ScriptEngineFactoryType>("makeScriptEngine");
-  std::unique_ptr<openstudio::ScriptEngine> pythonEngine(factory(argc, argv));
-
-  //#ifdef WITHRUBY
-  //ruby.exec(R"(puts("Hello from Ruby"))");
-  //#endif
+  openstudio::util::DynamicLibrary pythonEngineLib("/home/kbenne/Development/Cpp_Swig_Ruby_Python_MCVE/build/Products/libpythonengine.so");
+  std::function<ScriptEngineFactoryType> pythonFactory = pythonEngineLib.load_symbol<ScriptEngineFactoryType>("makeScriptEngine");
+  std::unique_ptr<openstudio::ScriptEngine> pythonEngine(pythonFactory(argc, argv));
 
   pythonEngine->exec(R"(print("Hello From Python"))");
 
-  //#ifdef WITHRUBY
-  //ruby.registerType<Test::Measure*>("Test::Measure *");
-  //#endif
+  openstudio::util::DynamicLibrary rubyEngineLib("/home/kbenne/Development/Cpp_Swig_Ruby_Python_MCVE/build/Products/librubyengine.so");
+  std::function<ScriptEngineFactoryType> rubyFactory = rubyEngineLib.load_symbol<ScriptEngineFactoryType>("makeScriptEngine");
+  //std::unique_ptr<openstudio::ScriptEngine> rubyEngine(rubyFactory(argc, argv));
 
+  //rubyEngine->exec(R"(puts("Hello from Ruby"))");
+
+  //rubyEngine->registerType<Test::Measure*>("Test::Measure *");
   pythonEngine->registerType<Test::Measure*>("Test::Measure *");
 
-  //#ifdef WITHRUBY
-  //const auto rubyMeasurePath = sourceDir() / "ruby/test_measure.rb";
-  //ruby.exec(fmt::format("require '{}'", rubyMeasurePath.string()));
-  //auto ruby_measure = ruby.eval("RubyTestMeasure.new()");
+  //const auto rubyMeasurePath = sourceDir() / "ruby/measures/test_measure.rb";
+  //rubyEngine->exec(fmt::format("require '{}'", rubyMeasurePath.string()));
+  //auto ruby_measure = rubyEngine->eval("RubyTestMeasure.new()");
   //auto* ruby_measure_from_cpp = ruby.getAs<Test::Measure*>(ruby_measure);
   //assert(ruby_measure_from_cpp);
   //std::cout << "Ruby measure name: " << ruby_measure_from_cpp->name() << '\n';
-  //#endif
 
   const auto pythonMeasurePath = sourceDir() / "python/measures";
   pythonEngine->exec(fmt::format("import sys\nsys.path.append('{}')\nprint(f'{{sys.path}}')", pythonMeasurePath.string()));
