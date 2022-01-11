@@ -5,6 +5,7 @@
 #include <time.h>
 #include <string>
 #include <stdexcept>
+#include <iostream>
 
 #ifdef __GNUC__
 #  pragma GCC diagnostic push
@@ -16,6 +17,13 @@
 #ifdef __GNUC__
 #  pragma GCC diagnostic pop
 #endif
+
+unsigned init() {
+  ruby_setup();
+  return 0;
+}
+
+static auto i = init();
 
 namespace openstudio {
 
@@ -31,7 +39,7 @@ static VALUE evaluateSimpleImpl(VALUE arg) {
   return rb_eval_string(StringValuePtr(arg));
 }
 
-int evalString(const std::string& t_str) {
+VALUE evalString(const std::string& t_str) {
   VALUE val = rb_str_new2(t_str.c_str());
   int error;
   // save and restore the current working directory in case the call to ruby upsets it
@@ -47,7 +55,6 @@ int evalString(const std::string& t_str) {
   }
 
   return result;
-  //return 0;
 }
 
 ScriptObject RubyEngine::eval(std::string_view sv) {

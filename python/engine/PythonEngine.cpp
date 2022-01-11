@@ -1,5 +1,4 @@
 #include "PythonEngine.hpp"
-
 #include <string>
 #include <stdexcept>
 
@@ -9,9 +8,9 @@
 #endif
 
 #include <Python.h>
-//#include "SWIGPythonRuntime.hxx"
 #include "OpenStudioPYTHON_wrap.cxx"
 #include "embedded_files.hxx"
+
 #ifdef __GNUC__
 #  pragma GCC diagnostic pop
 #endif
@@ -102,46 +101,12 @@ void PythonEngine::exec(std::string_view sv) {
 
   PyObject* globalDict = PyModule_GetDict(m);
 
-  // Find mylib.py (the python thing that swig spits out)
-  // PyRun_SimpleString("import sys\nsys.path.append('/home/julien/Software/Cpp_Swig_Ruby_Python_MCVE/build-modif/temp/')\nprint(f'{sys.path}')");
-
-  //std::string myModuleStr("def add( n1 , n2 ):\n    return n1+n2");
-  //PyObject* pCompiledFn = Py_CompileString( myModuleStr.c_str() , "" , Py_file_input );
-
-
   std::string fileContent = embedded_files::getFileAsString(":/python/mylib.py");
-  // std::cout << fileContent << '\n';
-
-  //PyObject* pCompiledFn = Py_CompileString( fileContent.c_str() , "" , Py_file_input ) ;
-  // PyObject* pModule = PyImport_ExecCodeModule( "mylib" , pCompiledFn ) ;
-
-  /*
-  PyObject *pyModule = PyModule_New("mylib");
-  // Set properties on the new module object
-  PyModule_AddStringConstant(pyModule, "__file__", "");
-  //PyObject *localDict = PyModule_GetDict(pyModule);   // Returns a borrowed reference: no need to Py_DECREF() it once we are done
-  PyObject *builtins = PyEval_GetBuiltins();  // Returns a borrowed reference: no need to Py_DECREF() it once we are done
-  PyDict_SetItemString(globalDict, "__builtins__", builtins);
-  PyDict_SetItemString(globalDict, "mylib", pyModule);
-
-  // Define code in the newly created module
-  PyObject *pyValue = PyRun_String(fileContent.c_str(), Py_file_input, globalDict, globalDict);
-  if (pyValue == NULL) {
-    // Handle error
-    std::cout << "Unable to initialize mylib\n";
-  } else {
-      Py_DECREF(pyValue);
-  }
-*/
 
   PyObject *builtins = PyEval_GetBuiltins();
   PyObject *compile = PyDict_GetItemString(builtins, "compile");
   PyObject *code = PyObject_CallFunction(compile, "sss", fileContent.c_str(), "mylib.py", "exec");
   PyObject *pyModule = PyImport_ExecCodeModule("mylib", code);
-
-
-  // PyRun_SimpleString("import sys\nsys.path.append(':')\nprint(f'{sys.path}')");
-  // PySys_SetPath(L"/home/julien/Software/Cpp_Swig_Ruby_Python_MCVE/build-modif/Products/python"); // Find mylib.py
 
   PyObject* v = PyRun_String(command.c_str(), Py_file_input, globalDict, globalDict);
   if (v == nullptr) {
@@ -167,11 +132,6 @@ ScriptObject PythonEngine::eval(std::string_view sv) {
   PyObject* d = PyModule_GetDict(m);
 
   std::string fileContent = embedded_files::getFileAsString(":/python/mylib.py");
-  //std::cout << fileContent << '\n';
-  //PySys_SetPath(L"/home/julien/Software/Cpp_Swig_Ruby_Python_MCVE/build-modif/Products/python"); // Find mylib.py
-  PyRun_SimpleString("print('Hello from PythonEngine::eval')");
-  //PyObject *mylib_module = PyImport_Import(PyString_FromString("mylib"));
-  //PyModule_AddObject(m, "mylib", mylib_module);
 
   PyObject* v = PyRun_String(command.c_str(), Py_eval_input, d, d);
   if (v == nullptr) {
