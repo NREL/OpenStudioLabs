@@ -2,18 +2,27 @@
 #define MODELOBJECT_HPP
 
 #include <string>
+#include <memory>
 
 namespace Test {
 
+  class Model;
+
   class ModelObject {
     public:
-      explicit ModelObject(std::string name);
+      explicit ModelObject(Model & model);
+
+      std::string toString() const;
       const std::string& getName() const;
       bool setName(const std::string& name);
 
     private:
-      std::string name_;
+      class Impl;
+      std::shared_ptr<Impl> impl;
   };
+
 }  // namespace Test
+
+
 
 #endif

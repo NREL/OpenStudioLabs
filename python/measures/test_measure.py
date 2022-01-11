@@ -11,10 +11,8 @@ class PythonTestMeasure(mylib.PythonMeasure):
 
     def run_impl(self, r: mylib.Runner):
         m = r.get_current_model()
-        m.pushOp("Op from Python")
-        m.setName("Python Model")
-        m.pushObject("Python Space")
-        m.getObject(1).setName("MODIFIED FROM PYTHON")
+        obj = mylib.ModelObject(m)
+        obj.setName("ModelObject created in Python")
 
         return True
 

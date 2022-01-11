@@ -10,6 +10,7 @@ add_library(model OBJECT
 target_include_directories(model INTERFACE ./)
 
 target_link_libraries(model PRIVATE
+  CONAN_PKG::fmt
   cpp_warning_options
   cpp_compile_options
 )

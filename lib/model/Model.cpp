@@ -1,44 +1,41 @@
 #include "Model.hpp"
 #include "ModelObject.hpp"
+#include <sstream>
+#include <iostream>
 
 namespace Test {
-  Model::Model(std::string name) : name_(std::move(name)) {}
-
-  const std::string& Model::getName() const {
-    return name_;
-  }
-
-  bool Model::setName(const std::string& name) {
-    name_ = name;
-    return true;
-  }
-
-  void Model::pushOp(const std::string& op_name) {
-    opsPerformed_.push_back(op_name);
-  }
-
-  const std::vector<std::string>& Model::opsPerformed() const {
-    return opsPerformed_;
-  }
-
-  int Model::numObjects() const {
-    return static_cast<int>(m_objects.size());
-  }
-
-  std::vector<std::string> Model::objectNames() const {
-    std::vector<std::string> result;
-    for (auto objPtr : m_objects) {
-      result.push_back(objPtr.getName());
+  class Model::Impl {
+   public:
+    void addModelObject(ModelObject modelObject) {
+      objects.push_back(modelObject);
     }
-    return result;
+
+    std::string toString() const {
+      std::stringstream ss;
+
+      ss << "{" << std::endl;
+      for (const auto mo: objects) {
+        ss << mo.toString() << "," << std::endl;
+      }
+      ss << "}" << std::endl;
+
+      return ss.str();
+    }
+
+   private:
+    std::vector<ModelObject> objects;
+  };
+
+  Model::Model()
+    : impl{std::make_shared<Impl>()}
+  {
   }
 
-  ModelObject& Model::getObject(size_t index) {
-    return m_objects[index];
+  void Model::addModelObject(ModelObject modelObject) {
+    impl->addModelObject(modelObject);
   }
 
-  void Model::pushObject(const std::string& objName) {
-    m_objects.emplace_back(objName);
+  std::string Model::toString() const {
+    return impl->toString();
   }
-
 }  // namespace Test

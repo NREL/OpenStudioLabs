@@ -9,22 +9,17 @@ namespace Test {
   class Model
   {
     public:
-      explicit Model(std::string name);
-      const std::string& getName() const;
-      bool setName(const std::string& name);
+      explicit Model();
+      std::string toString() const;
 
-      void pushOp(const std::string& op_name);
+    protected:
+      friend class ModelObject;
 
-      const std::vector<std::string>& opsPerformed() const;
+      void addModelObject(ModelObject modelObject);
 
-      int numObjects() const;
-      std::vector<std::string> objectNames() const;
-      ModelObject& getObject(size_t index);
-      void pushObject(const std::string& objName);
     private:
-      std::string name_;
-      std::vector<std::string> opsPerformed_;
-      std::vector<ModelObject> m_objects;
+      class Impl;
+      std::shared_ptr<Impl> impl;
   };
 }  // namespace Test
 

@@ -14,7 +14,6 @@
 #include "config.hxx"
 
 int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
-  
   openstudio::util::DynamicLibrary pythonEngineLib(openstudio::getCurrentModuleDir() / "libpythonengine.so");
   std::function<ScriptEngineFactoryType> pythonFactory = pythonEngineLib.load_symbol<ScriptEngineFactoryType>("makeScriptEngine");
   std::unique_ptr<openstudio::ScriptEngine> pythonEngine(pythonFactory(argc, argv));
@@ -46,40 +45,15 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
 
   std::cout << "Python measure name: " << python_measure_from_cpp->name() << '\n';
 
-  //auto printObjectNames = [](Test::Model& m) {
-  //  for (int i = 0; i < m.numObjects(); ++i) {
-  //    std::cout << " * " << i <<" = " << m.getObject(i).getName() << '\n';
-  //  }
-  //};
+  Test::Model m;
 
-  Test::Model m{"C++ Model"};
-  m.pushObject("C++ object");
+  Test::ModelObject obj(m);
+  obj.setName("ModelObject created in C++");
 
   Test::SpecialRunner sr(m);
-
-  //printObjectNames(sr.get_current_model());
-
   ruby_measure_from_cpp->run(sr);
   python_measure_from_cpp->run(sr);
 
-
-  //std::cout << "C++: " <<  sr.get_current_model().numObjects() << " objects\n";
-  //printObjectNames(sr.get_current_model());
-
-
-  /////////---------//#if defined(WITHPYTHON) && defined(WITHRUBY)
-  /////////---------std::cout << "After Running Ruby and Python: model is named " << sr.get_current_model().getName() << '\n';
-  /////////---------//#elif defined (WITHRUBY)
-  /////////---------//  std::cout << "After Running Ruby only: model is named " << sr.get_current_model().getName() << '\n';
-  /////////---------//#elif defined(WITHPYTHON)
-  /////////---------//  std::cout << "After Running Python only: model is named " << sr.get_current_model().getName() << '\n';
-  /////////---------//#endif
-
-  /////////---------for (const auto& op : sr.get_current_model().opsPerformed()) {
-  /////////---------  std::cout << "Op 'run' from script: " << op << '\n';
-  /////////---------}
-
-  /////////---------std::cout << "C++: " <<  sr.get_current_model().numObjects() << " objects\n";
-  /////////---------printObjectNames(sr.get_current_model());
+  std::cout << m.toString() << std::endl;
 }
 
