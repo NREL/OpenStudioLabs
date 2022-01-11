@@ -2,13 +2,12 @@
 
 add_subdirectory(model)
 add_subdirectory(workflow)
+add_subdirectory(util)
 
 add_library(openstudiolib STATIC
   empty.cpp
 )
 
-target_include_directories(openstudiolib INTERFACE util)
-
 target_link_libraries(openstudiolib
-  model workflow ${CMAKE_DL_LIBS}
+  model workflow utilities ${CMAKE_DL_LIBS}
 )

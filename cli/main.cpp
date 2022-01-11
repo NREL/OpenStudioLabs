@@ -10,17 +10,18 @@
 #include "SpecialRunner.hpp"
 #include "Model.hpp"
 #include "DynamicLibrary.hpp"
+#include "Paths.hpp"
 #include "config.hxx"
 
 int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   
-  openstudio::util::DynamicLibrary pythonEngineLib("/home/kbenne/Development/Cpp_Swig_Ruby_Python_MCVE/build/Products/libpythonengine.so");
+  openstudio::util::DynamicLibrary pythonEngineLib(openstudio::getCurrentModuleDir() / "libpythonengine.so");
   std::function<ScriptEngineFactoryType> pythonFactory = pythonEngineLib.load_symbol<ScriptEngineFactoryType>("makeScriptEngine");
   std::unique_ptr<openstudio::ScriptEngine> pythonEngine(pythonFactory(argc, argv));
 
   pythonEngine->exec(R"(print("Hello From Python"))");
 
-  openstudio::util::DynamicLibrary rubyEngineLib("/home/kbenne/Development/Cpp_Swig_Ruby_Python_MCVE/build/Products/librubyengine.so");
+  openstudio::util::DynamicLibrary rubyEngineLib(openstudio::getCurrentModuleDir() / "librubyengine.so");
   std::function<ScriptEngineFactoryType> rubyFactory = rubyEngineLib.load_symbol<ScriptEngineFactoryType>("makeScriptEngine");
   std::unique_ptr<openstudio::ScriptEngine> rubyEngine(rubyFactory(argc, argv));
 
