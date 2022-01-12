@@ -23,8 +23,8 @@
   // ... code in init section ...
 %}
 
-%module mylib
-%module(directors="1") mylib
+%module openstudio
+%module(directors="1") openstudio
 
 %include <stl.i>
 %include <std_string.i>
@@ -32,20 +32,16 @@
 
 %feature("director") Measure;
 
-#if defined(SWIGPYTHON)
-%rename (PythonMeasure) Test::Measure;
-#endif
-
 %{
-  #include <lib/model/ModelObject.hpp>
-  #include <lib/model/Model.hpp>
-  #include <lib/workflow/Runner.hpp>
-  #include <lib/workflow/Measure.hpp>
+  #include <ModelObject.hpp>
+  #include <Model.hpp>
+  #include <Runner.hpp>
+  #include <Measure.hpp>
 %}
 
-%include <lib/model/ModelObject.hpp>
-%include <lib/model/Model.hpp>
-%include <lib/workflow/Runner.hpp>
-%include <lib/workflow/Measure.hpp>
+%include <ModelObject.hpp>
+%include <Model.hpp>
+%include <Runner.hpp>
+%include <Measure.hpp>
 
 #endif //WORKFLOW_I

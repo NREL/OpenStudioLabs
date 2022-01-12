@@ -1,4 +1,4 @@
-class RubyTestMeasure < Mylib::Measure
+class RubyTestMeasure < Openstudio::Measure
 
   def name
     return "RubyTestMeasure"
@@ -6,7 +6,7 @@ class RubyTestMeasure < Mylib::Measure
 
   def run_impl(runner)
     m = runner.get_current_model()
-    obj = Mylib::ModelObject.new(m)
+    obj = Openstudio::ModelObject.new(m)
     obj.setName("ModelObject created in Ruby");
 
     return true;

@@ -1,11 +1,6 @@
-// CMake defines WITHPYTHON / WITHRUBY (or not)
-
 #include <iostream>
-#include <cassert>
-#include <functional>
 #include <fmt/format.h>
-
-#include "scripting/ScriptEngine.hpp"
+#include "ScriptEngine.hpp"
 #include "Measure.hpp"
 #include "SpecialRunner.hpp"
 #include "Model.hpp"
@@ -33,7 +28,6 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   rubyEngine->exec(fmt::format("require '{}'", rubyMeasurePath.string()));
   auto ruby_measure = rubyEngine->eval("RubyTestMeasure.new()");
   auto* ruby_measure_from_cpp = rubyEngine->getAs<Test::Measure*>(ruby_measure);
-  assert(ruby_measure_from_cpp);
   std::cout << "Ruby measure name: " << ruby_measure_from_cpp->name() << '\n';
 
   const auto pythonMeasurePath = sourceDir() / "python/measures";
@@ -41,7 +35,6 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   pythonEngine->exec("import test_measure");
   auto python_measure = pythonEngine->eval("test_measure.PythonTestMeasure()");
   auto* python_measure_from_cpp = pythonEngine->getAs<Test::Measure*>(python_measure);
-  assert(python_measure_from_cpp);
 
   std::cout << "Python measure name: " << python_measure_from_cpp->name() << '\n';
 

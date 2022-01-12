@@ -101,12 +101,12 @@ void PythonEngine::exec(std::string_view sv) {
 
   PyObject* globalDict = PyModule_GetDict(m);
 
-  std::string fileContent = embedded_files::getFileAsString(":/python/mylib.py");
+  std::string fileContent = embedded_files::getFileAsString(":/python/openstudio.py");
 
   PyObject *builtins = PyEval_GetBuiltins();
   PyObject *compile = PyDict_GetItemString(builtins, "compile");
-  PyObject *code = PyObject_CallFunction(compile, "sss", fileContent.c_str(), "mylib.py", "exec");
-  PyObject *pyModule = PyImport_ExecCodeModule("mylib", code);
+  PyObject *code = PyObject_CallFunction(compile, "sss", fileContent.c_str(), "openstudio.py", "exec");
+  PyObject *pyModule = PyImport_ExecCodeModule("openstudio", code);
 
   PyObject* v = PyRun_String(command.c_str(), Py_file_input, globalDict, globalDict);
   if (v == nullptr) {
@@ -131,7 +131,7 @@ ScriptObject PythonEngine::eval(std::string_view sv) {
 
   PyObject* d = PyModule_GetDict(m);
 
-  std::string fileContent = embedded_files::getFileAsString(":/python/mylib.py");
+  std::string fileContent = embedded_files::getFileAsString(":/python/openstudio.py");
 
   PyObject* v = PyRun_String(command.c_str(), Py_eval_input, d, d);
   if (v == nullptr) {

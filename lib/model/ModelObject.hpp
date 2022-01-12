@@ -23,6 +23,4 @@ namespace Test {
 
 }  // namespace Test
 
-
-
-#endif
+#endif // MODELOBJECT_HPP

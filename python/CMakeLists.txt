@@ -9,13 +9,22 @@ find_package(
   REQUIRED
 )
 
-set_source_files_properties(../scripting/OpenStudio.i PROPERTIES CPLUSPLUS ON)
+set_source_files_properties(
+  ../scripting/OpenStudio.i
+  PROPERTIES
+  CPLUSPLUS ON
+)
 
 swig_add_library(
   pythonbindings TYPE STATIC
   LANGUAGE python 
   OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}
   SOURCES ../scripting/OpenStudio.i
+)
+
+set_target_properties(pythonbindings
+  PROPERTIES
+  SWIG_USE_TARGET_INCLUDE_DIRECTORIES ON
 )
 
 target_include_directories(
@@ -29,11 +38,7 @@ target_link_libraries(
   PRIVATE openstudiolib
 )
 
-#if(MSVC)
-#swig_link_libraries(${swig_target_name} PRIVATE Python::Module)
-#endif()
-
-set (EXTENSION_PY "${CMAKE_CURRENT_BINARY_DIR}/mylib.py")
+set (EXTENSION_PY "${CMAKE_CURRENT_BINARY_DIR}/openstudio.py")
 foreach( _FILE ${EXTENSION_PY} )
   file(RELATIVE_PATH LOCATION ${CMAKE_CURRENT_BINARY_DIR} ${_FILE})
   list(APPEND FILES ${_FILE})
@@ -56,8 +61,9 @@ add_library(
 )
 
 target_include_directories(pythonengine INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/engine)
+target_include_directories(pythonengine PRIVATE ${PROJECT_BINARY_DIR})
 
 target_link_libraries(
   pythonengine
-  PRIVATE pythonbindings Python::Python cpp_compile_options
+  PRIVATE pythonbindings openstudiolib Python::Python cpp_compile_options
 )

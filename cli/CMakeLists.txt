@@ -1,4 +1,4 @@
-# CLItest
+# cli
 
 add_executable(
   openstudio
@@ -7,5 +7,9 @@ add_executable(
 
 target_link_libraries(
   openstudio
-  openstudiolib CONAN_PKG::fmt cpp_compile_options
+  openstudiolib 
+  config
+  scripting
+  cpp_compile_options
+  CONAN_PKG::fmt 
 )

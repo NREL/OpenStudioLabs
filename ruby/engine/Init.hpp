@@ -6,7 +6,7 @@
 extern "C"
 {
   // OpenStudio specific bindings
-  void Init_mylib(void);
+  void Init_openstudio(void);
 }
 
 namespace openstudio {
@@ -14,10 +14,8 @@ namespace openstudio {
 namespace ruby {
 
 void init() {
-  // OpenStudio specific bindings
   ruby_setup();
-  //Init_encodings();
-  Init_mylib();
+  Init_openstudio();
 }
 
 } // ruby

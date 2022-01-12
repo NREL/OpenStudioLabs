@@ -1,25 +1,15 @@
-# import sys
-# sys.path.append("/home/julien/Software/Cpp_Swig_Ruby_Python_MCVE/build-modif/Products/python/")
+import openstudio
 
-from time import time, ctime
-
-import mylib
-
-class PythonTestMeasure(mylib.PythonMeasure):
+class PythonTestMeasure(openstudio.Measure):
     def __init__(self):
-        mylib.PythonMeasure.__init__(self)
+        openstudio.Measure.__init__(self)
 
-    def run_impl(self, r: mylib.Runner):
+    def run_impl(self, r: openstudio.Runner):
         m = r.get_current_model()
-        obj = mylib.ModelObject(m)
+        obj = openstudio.ModelObject(m)
         obj.setName("ModelObject created in Python")
 
         return True
 
     def name(self):
         return "Python Test Measure"
-
-
-def make_measure():
-    return PythonTestMeasure()
-

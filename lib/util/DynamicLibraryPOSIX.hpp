@@ -24,7 +24,7 @@ struct DynamicLibrary
   }
 
   explicit DynamicLibrary(std::filesystem::path location)
-      : m_location{std::move(location)}, m_handle{dlopen(m_location.c_str(), RTLD_LAZY | RTLD_DEEPBIND), m_handle_deleter}
+      : m_location{std::move(location)}, m_handle{dlopen(m_location.c_str(), RTLD_LAZY), m_handle_deleter}
   {
     if (!m_handle) {
       throw std::runtime_error(fmt::format("Unable to load library '{}', reason: '{}'", m_location.string(), dlerror()));
