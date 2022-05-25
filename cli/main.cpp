@@ -32,7 +32,7 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   pythonEngine->exec("import test_measure");
   auto python_measure = pythonEngine->eval("test_measure.PythonTestMeasure()");
   auto python_measure_from_cpp = pythonEngine->getAs<openstudio::Measure*>(python_measure);
-  std::cout << "\nPython measure name: " << python_measure_from_cpp->name() << std::endl;;
+  std::cout << "\nPython measure name: " << python_measure_from_cpp->name() << std::endl;
 
   // Boilerplate to load a prototypical RUBY Measure.
   const auto rubyMeasurePath = sourceDir() / "ruby/measures/test_measure.rb";
