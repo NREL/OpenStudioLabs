@@ -65,5 +65,5 @@ target_include_directories(pythonengine PRIVATE ${PROJECT_BINARY_DIR})
 
 target_link_libraries(
   pythonengine
-  PRIVATE pythonbindings openstudiolib Python::Python cpp_compile_options
+  PRIVATE pythonbindings openstudiolib Python::Python cpp_compile_options CONAN_PKG::zlib
 )

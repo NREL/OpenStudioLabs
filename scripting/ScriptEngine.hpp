@@ -10,6 +10,9 @@
 #include <stdexcept>
 
 namespace openstudio {
+
+class Measure;
+
 struct ScriptObject
 {
   std::any object;
@@ -18,7 +21,10 @@ struct ScriptObject
 class ScriptEngine
 {
  public:
-  ScriptEngine() = default;
+  ScriptEngine() {
+    registerType<openstudio::Measure*>("openstudio::Measure *");
+  }
+
   virtual ~ScriptEngine() = default;
   ScriptEngine(const ScriptEngine&) = delete;
   ScriptEngine(ScriptEngine&&) = delete;
@@ -71,7 +77,7 @@ class ScriptEngine
   std::map<std::reference_wrapper<const std::type_info>, std::string, Compare> types;
 };
 
-}  // namespace Test
+}  // namespace epenstudio
 
 typedef openstudio::ScriptEngine* ScriptEngineFactoryType (const int argc, const char* argv[]);
 

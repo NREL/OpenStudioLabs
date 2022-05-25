@@ -3,7 +3,7 @@
 #include <sstream>
 #include <iostream>
 
-namespace Test {
+namespace openstudio {
   class Model::Impl {
    public:
     void addModelObject(ModelObject modelObject) {
@@ -38,4 +38,4 @@ namespace Test {
   std::string Model::toString() const {
     return impl->toString();
   }
-}  // namespace Test
+}  // namespace openstudio

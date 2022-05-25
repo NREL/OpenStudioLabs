@@ -28,7 +28,7 @@ class PythonEngine final : public ScriptEngine
   wchar_t* program;
 };
 
-}  // namespace Test
+}  // namespace openstudio
 
 extern "C" {
 openstudio::ScriptEngine* makeScriptEngine(const int argc, const char* argv[]) {

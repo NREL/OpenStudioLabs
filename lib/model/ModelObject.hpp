@@ -4,7 +4,7 @@
 #include <string>
 #include <memory>
 
-namespace Test {
+namespace openstudio {
 
   class Model;
 
@@ -21,6 +21,6 @@ namespace Test {
       std::shared_ptr<Impl> impl;
   };
 
-}  // namespace Test
+}  // namespace openstudio
 
 #endif // MODELOBJECT_HPP

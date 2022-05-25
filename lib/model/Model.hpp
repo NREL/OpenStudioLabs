@@ -5,7 +5,7 @@
 #include <vector>
 #include "ModelObject.hpp"
 
-namespace Test {
+namespace openstudio {
   class Model
   {
     public:
@@ -21,6 +21,6 @@ namespace Test {
       class Impl;
       std::shared_ptr<Impl> impl;
   };
-}  // namespace Test
+}  // namespace openstudio
 
 #endif

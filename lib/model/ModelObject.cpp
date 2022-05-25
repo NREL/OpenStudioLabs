@@ -2,7 +2,7 @@
 #include "Model.hpp"
 #include <fmt/format.h>
 
-namespace Test {
+namespace openstudio {
   class ModelObject::Impl {
    public:
     const std::string& getName() const {
@@ -46,4 +46,4 @@ namespace Test {
   std::string ModelObject::toString() const {
     return impl->toString();
   }
-}  // namespace Test
+}  // namespace openstudio

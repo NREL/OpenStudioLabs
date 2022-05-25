@@ -1,8 +1,9 @@
-#ifndef TEST_SWIG_RUNNER_HPP
-#define TEST_SWIG_RUNNER_HPP
+#ifndef OPENSTUDIO_SWIG_RUNNER_HPP
+#define OPENSTUDIO_SWIG_RUNNER_HPP
 
-namespace Test {
-class Model;
+#include "Model.hpp"
+
+namespace openstudio {
 
 class Runner
 {
@@ -12,15 +13,16 @@ class Runner
   Runner &operator=(const Runner &) = delete;
   Runner(Runner &&) = delete;
   Runner(const Runner &) = delete;
-  Runner() = default;
+  Runner() = delete;
+  Runner(Model model) : model_(std::move(model)) {}
 
-  Model &get_current_model() { return get_current_model_impl(); }
+  Model &get_current_model() { return model_; }
 
- protected:
-
-  virtual Model& get_current_model_impl() = 0;
+ private:
+  Model model_;
 
 };
-}  // namespace Test
 
-#endif  //TEST_SWIG_RUNNER_HPP
+}  // namespace openstudio
+
+#endif  //OPENSTUDIO_SWIG_RUNNER_HPP

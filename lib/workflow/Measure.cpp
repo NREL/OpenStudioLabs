@@ -1,7 +1,7 @@
 #include "Measure.hpp"
 
-namespace Test {
+namespace openstudio {
 bool Measure::run(Runner& runner) {
   return run_impl(runner);
 }
-}  // namespace Test
+}  // namespace openstudio

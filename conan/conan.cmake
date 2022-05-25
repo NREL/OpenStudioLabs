@@ -21,10 +21,8 @@ conan_check(VERSION 1.28.0 REQUIRED)
 
 message(STATUS "openstudio: RUNNING CONAN")
 
-# Add NREL remote and place it first in line, since we vendored dependencies to NREL's repo, they will be picked first
-# TJC 2021-04-27 bintray.com is decommissioned as of 2021-05-01. See commercialbuildings as replacement below.
 conan_add_remote(NAME nrel INDEX 0
-   URL https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio)
+   URL https://conan.openstudio.net/artifactory/api/conan/openstudio)
 
 conan_add_remote(NAME bincrafters
   URL https://bincrafters.jfrog.io/artifactory/api/conan/public-conan)
@@ -42,18 +40,15 @@ if (NOT "${CONAN_REV_STATUS}" STREQUAL "True")
   execute_process(COMMAND ${CONAN_CMD} config set general.revisions_enabled=True)
 endif()
 
-list(APPEND CONAN_OPTIONS "zlib:minizip=True")
-list(APPEND CONAN_BUILD "missing")
-
 conan_cmake_run(REQUIRES
-  "openstudio_ruby/2.7.2"
-  "zlib/1.2.11#0df31fd24179543f5720ec7beb2a88d7"
+  "openstudio_ruby/2.7.2@nrel/testing#dcea3703b5dfaecfa5f0056d952ea5bd"
+  "minizip/1.2.12#0b5296887a2558500d0323c6c94c8d02"
+  "zlib/1.2.12#3b9e037ae1c615d045a06c67d88491ae"
+  "minizip/1.2.12#0b5296887a2558500d0323c6c94c8d02"
+  "fmt/7.0.1#0580b1492b1dddb43b1768e68f25c43c"
   "swig/4.0.2#bfafb16cd2bea6af3b8003163abcbd09"
-  "fmt/6.1.2"
-  ${CONAN_GTEST}
   BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS
-  OPTIONS ${CONAN_OPTIONS}
-  BUILD ${CONAN_BUILD}
+  BUILD missing
   # Passes `-u, --update`    to conan install: Check updates exist from upstream remotes
   # That and build=outdated should ensure we track the right
   # Now that we pin dependencies, there is no point looking upstream really, so we'll save valuable configuration time by not doing it

@@ -1,7 +1,7 @@
 class RubyTestMeasure < Openstudio::Measure
 
   def name
-    return "RubyTestMeasure"
+    return "Ruby Test Measure"
   end
 
   def run_impl(runner)

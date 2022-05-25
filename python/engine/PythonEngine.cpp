@@ -17,12 +17,7 @@
 
 namespace openstudio {
 
-PythonEngine::PythonEngine([[maybe_unused]] const int argc, const char* argv[]) : program(Py_DecodeLocale(argv[0], nullptr)) {
-  if (program == nullptr) {
-    fprintf(stderr, "Fatal error: cannot decode argv[0]\n");
-    exit(1);
-  }
-
+PythonEngine::PythonEngine([[maybe_unused]] const int argc, const char* argv[]) : program(Py_DecodeLocale("python3.7", nullptr)) {
   PyImport_AppendInittab("_pythonbindings", SWIG_init);
 
   Py_SetProgramName(program);  // optional but recommended
@@ -114,11 +109,8 @@ void PythonEngine::exec(std::string_view sv) {
     throw std::runtime_error("Error executing Python code");
   }
 
-  //decref count returned from Python
   Py_DECREF(v);
   Py_DecRef( pyModule ) ;
-  //Py_DecRef( pyCompiledFn ) ;
-
 }
 
 ScriptObject PythonEngine::eval(std::string_view sv) {
@@ -172,4 +164,4 @@ void* PythonEngine::getAs_impl(ScriptObject& obj, const std::type_info& ti) {
 
   return return_value;
 }
-}  // namespace Test
+}  // namespace openstudio

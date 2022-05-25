@@ -6,9 +6,9 @@
 #include <iostream>
 #include <vector>
 
-namespace Test {
-class Runner;
+namespace openstudio {
 
+class Runner;
 class Model;
 
 class Measure
@@ -30,7 +30,6 @@ class Measure
   virtual bool run_impl(Runner&) = 0;
 };
 
-
-}  // Namespace Test
+}  // Namespace openstudio
 
 #endif  // ifndef MEASURE_HPP
