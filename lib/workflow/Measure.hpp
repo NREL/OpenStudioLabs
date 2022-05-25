@@ -22,12 +22,7 @@ class Measure
   virtual ~Measure() = default;
 
   virtual std::string name() = 0;
-  bool run(Runner&);
-
- protected:
-  // protected virtual here allows us to easily change the internal interface
-  // and behavior of measure
-  virtual bool run_impl(Runner&) = 0;
+  virtual bool run(Runner&) = 0;
 };
 
 }  // Namespace openstudio

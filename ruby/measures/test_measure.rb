@@ -4,7 +4,7 @@ class RubyTestMeasure < Openstudio::Measure
     return "Ruby Test Measure"
   end
 
-  def run_impl(runner)
+  def run(runner)
     m = runner.get_current_model()
     obj = Openstudio::ModelObject.new(m)
     obj.setName("ModelObject created in Ruby");
