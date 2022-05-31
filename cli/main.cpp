@@ -30,16 +30,16 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   const auto pythonMeasurePath = sourceDir() / "python/measures";
   pythonEngine->exec(fmt::format("import sys\nsys.path.append('{}')", pythonMeasurePath.string()));
   pythonEngine->exec("import test_measure");
-  auto python_measure = pythonEngine->eval("test_measure.PythonTestMeasure()");
-  auto python_measure_from_cpp = pythonEngine->getAs<openstudio::Measure*>(python_measure);
-  std::cout << "\nPython measure name: " << python_measure_from_cpp->name() << std::endl;
+  auto python_measure_pointer = pythonEngine->eval("test_measure.PythonTestMeasure()");
+  auto python_measure = pythonEngine->getAs<openstudio::Measure*>(python_measure_pointer);
+  std::cout << "\nPython measure name: " << python_measure->name() << std::endl;
 
   // Boilerplate to load a prototypical RUBY Measure.
   const auto rubyMeasurePath = sourceDir() / "ruby/measures/test_measure.rb";
   rubyEngine->exec(fmt::format("require '{}'", rubyMeasurePath.string()));
-  auto ruby_measure = rubyEngine->eval("RubyTestMeasure.new()");
-  auto ruby_measure_from_cpp = rubyEngine->getAs<openstudio::Measure*>(ruby_measure);
-  std::cout << "Ruby measure name: " << ruby_measure_from_cpp->name() << std::endl;
+  auto ruby_measure_pointer = rubyEngine->eval("RubyTestMeasure.new()");
+  auto ruby_measure = rubyEngine->getAs<openstudio::Measure*>(ruby_measure_pointer);
+  std::cout << "Ruby measure name: " << ruby_measure->name() << std::endl;
 
   // Run a mock OpenStudio Workflow
   // In the finished product this is orchestrated by the osw input
@@ -51,8 +51,8 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   obj.setName("ModelObject created in C++");
 
   openstudio::Runner r(m);
-  python_measure_from_cpp->run(r);
-  ruby_measure_from_cpp->run(r);
+  python_measure->run(r);
+  ruby_measure->run(r);
 
   std::cout << "Now the model is populated from C++, Python, and Ruby" << std::endl;
   std::cout << m.toString() << std::endl;
