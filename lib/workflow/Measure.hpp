@@ -25,7 +25,7 @@ class MEASURE_API Measure
   virtual ~Measure() = default;
 
   virtual std::string name() = 0;
-  virtual std::vector<OSArgument> arguments(const Model& model) const = 0;
+  virtual std::vector<OSArgument> arguments(const Model& model) const;
   virtual bool run(Model& model, Runner& runner, const OSArgumentMap& user_arguments) const;
 };
 

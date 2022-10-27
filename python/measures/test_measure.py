@@ -1,8 +1,6 @@
 import openstudio
 
 class PythonTestMeasure(openstudio.Measure):
-    def __init__(self):
-        openstudio.Measure.__init__(self)
 
     def name(self):
         return "Python Test Measure"

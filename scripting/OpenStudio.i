@@ -39,11 +39,11 @@
 #endif
 
 %{
+  #include <OSArgument.hpp>
   #include <ModelObject.hpp>
   #include <Model.hpp>
   #include <Runner.hpp>
   #include <Measure.hpp>
-  #include <OSArgument.hpp>
 %}
 
 %feature("director") Model;
@@ -54,10 +54,10 @@
 %template(OSArgumentVector) std::vector<openstudio::OSArgument>;
 %template(OSArgumentMap) std::map<std::string, openstudio::OSArgument>;
 
+%include <OSArgument.hpp>
 %include <ModelObject.hpp>
 %include <Model.hpp>
 %include <Runner.hpp>
 %include <Measure.hpp>
-%include <OSArgument.hpp>
 
 #endif //WORKFLOW_I
