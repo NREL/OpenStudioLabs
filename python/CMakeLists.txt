@@ -27,6 +27,7 @@ swig_add_library(
 set_target_properties(pythonbindings
   PROPERTIES
   SWIG_USE_TARGET_INCLUDE_DIRECTORIES ON
+  SWIG_GENERATED_COMPILE_OPTIONS "$<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:-Wno-deprecated-declarations>"
 )
 
 target_include_directories(
@@ -69,3 +70,7 @@ target_link_libraries(
   pythonengine
   PRIVATE pythonbindings openstudiolib Python::Python cpp_compile_options CONAN_PKG::zlib
 )
+
+if (APPLE)
+  set_target_properties(pythonengine PROPERTIES SUFFIX ".so")
+endif()

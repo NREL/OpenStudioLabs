@@ -100,17 +100,18 @@ extern "C"
   }
 }
 
-//extern "C"
-//{
-//  int rb_hasFile(const char* t_filename) {
-//    // TODO Consider expanding this to use the path which we have artificially defined in embedded_help.rb
-//    std::string expandedName = std::string(":/ruby/2.7.0/") + std::string(t_filename) + ".rb";
-//    return embedded_files::hasFile(expandedName);
-//  }
-//
-//  int rb_require_embedded(const char* t_filename) {
-//    std::string require_script = R"(require ')" + std::string(t_filename) + R"(')";
-//    Test::evalString(require_script);
-//    return 0;
-//  }
-//}
+extern "C"
+{
+  int rb_hasFile(const char* /*t_filename*/) {
+    // TODO Consider expanding this to use the path which we have artificially defined in embedded_help.rb
+    // std::string expandedName = std::string(":/ruby/2.7.0/") + std::string(t_filename) + ".rb";
+    // return embedded_files::hasFile(expandedName);
+    return 0;
+  }
+
+  int rb_require_embedded(const char* t_filename) {
+    std::string require_script = R"(require ')" + std::string(t_filename) + R"(')";
+    openstudio::evalString(require_script);
+    return 0;
+  }
+}

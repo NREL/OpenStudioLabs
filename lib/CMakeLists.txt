@@ -9,5 +9,5 @@ add_library(openstudiolib STATIC
 )
 
 target_link_libraries(openstudiolib
-  model workflow utilities ${CMAKE_DL_LIBS}
+  PUBLIC model workflow utilities ${CMAKE_DL_LIBS}
 )

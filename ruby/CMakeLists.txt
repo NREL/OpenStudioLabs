@@ -4,7 +4,7 @@ set_source_files_properties(../scripting/OpenStudio.i PROPERTIES CPLUSPLUS ON)
 
 swig_add_library(
   rubybindings TYPE STATIC
-  LANGUAGE ruby 
+  LANGUAGE ruby
   OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}
   SOURCES ../scripting/OpenStudio.i
 )
@@ -38,25 +38,17 @@ add_library(
 )
 
 target_include_directories(
-  rubyengine 
+  rubyengine
   PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
-)
-
-# For some unknown reason timer_create and other timer symbols are,
-# not included by the linker, even when explicitly linking the rt library
-# where these symbols are located.
-# Without "whole_archives" there is a runtime (not link time) error
-add_library(whole_archives INTERFACE)
-
-set_target_properties(whole_archives PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(whole_archives INTERFACE
-  -Wl,--whole-archive
-  rt
-  -Wl,--no-whole-archive
 )
 
 target_link_libraries(
   rubyengine
-  PRIVATE CONAN_PKG::openstudio_ruby rubybindings cpp_compile_options whole_archives
+  PRIVATE CONAN_PKG::openstudio_ruby rubybindings cpp_compile_options
 )
 
+if (APPLE)
+  find_library(COREFOUNDATION_LIBRARY CoreFoundation)
+  target_link_libraries(rubyengine PRIVATE ${COREFOUNDATION_LIBRARY})
+  set_target_properties(rubyengine PROPERTIES SUFFIX ".so")
+endif()
