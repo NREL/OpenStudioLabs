@@ -9,7 +9,7 @@ namespace openstudio {
 class RubyEngine final : public ScriptEngine
 {
  public:
-  RubyEngine(int argc = 0, char* argv[] = nullptr);
+  explicit RubyEngine(int argc = 0, char* argv[] = nullptr);
   ~RubyEngine() override;
 
   RubyEngine(const RubyEngine&) = delete;
