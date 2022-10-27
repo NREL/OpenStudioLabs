@@ -1,9 +1,15 @@
 # Config
+
+add_library(cpp_warning_options INTERFACE)
+add_library(cpp_compile_options INTERFACE)
+
+target_compile_features(cpp_compile_options INTERFACE cxx_std_17)
+
 include(CheckIncludeFile)
-#check_include_file("unistd.h" HAVE_UNISTD_H)
-#if(HAVE_UNISTD_H)
-target_compile_definitions(cpp_compile_options INTERFACE "-DHAVE_UNISTD_H")
-#endif()
+check_include_file("unistd.h" HAVE_UNISTD_H)
+if(HAVE_UNISTD_H)
+  target_compile_definitions(cpp_compile_options INTERFACE "-DHAVE_UNISTD_H")
+endif()
 
 if(MSVC)
   target_compile_options(cpp_warning_options INTERFACE /W4 /WX)
