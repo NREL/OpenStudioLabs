@@ -77,6 +77,6 @@ class ScriptEngine
 
 }  // namespace openstudio
 
-typedef openstudio::ScriptEngine* ScriptEngineFactoryType(const int argc, const char* argv[]);
+using ScriptEngineFactoryType = openstudio::ScriptEngine*(const int argc, const char* argv[]);
 
 #endif

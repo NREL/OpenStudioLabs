@@ -46,8 +46,13 @@ target_include_directories(
 
 target_link_libraries(
   rubyengine
-  PRIVATE CONAN_PKG::openstudio_ruby rubybindings cpp_compile_options
+  PRIVATE
+    CONAN_PKG::openstudio_ruby
+    rubybindings
+    cpp_compile_options
 )
+
+target_compile_definitions(rubyengine PRIVATE openstudio_scriptengine_EXPORTS SHARED_OS_LIBS)
 
 if(WIN32)
   target_link_libraries(rubyengine

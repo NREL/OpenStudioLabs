@@ -75,8 +75,15 @@ target_compile_options(pythonengine PRIVATE
 )
 target_link_libraries(
   pythonengine
-  PRIVATE pythonbindings openstudiolib Python::Python cpp_compile_options CONAN_PKG::zlib
+  PRIVATE
+	pythonbindings
+	openstudiolib
+	Python::Python
+	cpp_compile_options
+	CONAN_PKG::zlib
 )
+
+target_compile_definitions(pythonengine PRIVATE openstudio_scriptengine_EXPORTS SHARED_OS_LIBS)
 
 if (APPLE)
   set_target_properties(pythonengine PROPERTIES SUFFIX ".so")

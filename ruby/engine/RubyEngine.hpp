@@ -2,6 +2,7 @@
 #define RUBYENGINE_included
 
 #include "../../scripting/ScriptEngine.hpp"
+#include "../../scripting/ScriptEngineAPI.hpp"
 
 namespace openstudio {
 
@@ -25,11 +26,11 @@ class RubyEngine final : public ScriptEngine
   void* getAs_impl(ScriptObject& obj, const std::type_info&) override;
 };
 
+}  // namespace openstudio
+
 extern "C"
 {
-  openstudio::ScriptEngine* makeScriptEngine([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]);
+  SCRIPTENGINE_API openstudio::ScriptEngine* makeScriptEngine([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]);
 }
-
-}  // namespace openstudio
 
 #endif

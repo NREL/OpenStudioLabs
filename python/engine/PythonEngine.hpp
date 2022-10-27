@@ -2,7 +2,9 @@
 #define PYTHONENGINE_included
 
 #include <memory>
+
 #include "../../scripting/ScriptEngine.hpp"
+#include "../../scripting/ScriptEngineAPI.hpp"
 
 namespace openstudio {
 class PythonEngine final : public ScriptEngine
@@ -32,9 +34,7 @@ class PythonEngine final : public ScriptEngine
 
 extern "C"
 {
-  openstudio::ScriptEngine* makeScriptEngine(const int argc, const char* argv[]) {
-    return new openstudio::PythonEngine(argc, argv);
-  }
+  SCRIPTENGINE_API openstudio::ScriptEngine* makeScriptEngine(const int argc, const char* argv[]);
 }
 
 #endif
