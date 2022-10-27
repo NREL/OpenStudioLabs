@@ -7,6 +7,9 @@ include(config/config.cmake)
 # Dependencies
 include(conan/conan.cmake)
 
+option(USE_RUBY_ENGINE "Use RubyEngine" ON)
+option(USE_PYTHON_ENGINE "Use PythonEngine" ON)
+
 # Subprojects
 add_subdirectory(scripting)
 add_subdirectory(embedded)
