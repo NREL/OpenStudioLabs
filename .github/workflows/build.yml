@@ -1,0 +1,146 @@
+name: C++ CI
+
+on:
+  push:
+    branches: [ main, develop, ci ]
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+  pull_request:
+    branches: [ main, develop, ci ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04, macos-latest, windows-latest]
+        include:
+        - os: ubuntu-20.04
+          PLATFORM_NAME: Linux
+          BINARY_EXT: run
+        - os: macos-latest
+          PLATFORM_NAME: Darwin
+          BINARY_EXT: dmg
+        - os: windows-latest
+          PLATFORM_NAME: win64
+          BINARY_EXT: exe
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions/setup-python@v4
+      id: setup-python
+      with:
+        python-version: '3.8'
+
+    - name: Install deps
+      shell: bash
+      run: |
+        set -x
+        mkdir build
+
+        cd build
+
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          echo "Using apt to install ninja"
+          sudo apt update
+          sudo apt -y -qq install ninja-build
+
+          echo CC=gcc-10 >> $GITHUB_ENV
+          echo CXX=g++-10 >> $GITHUB_ENV
+
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          echo "Using brew to install ninja"
+          brew install ninja
+          echo "Setting MACOSX_DEPLOYMENT_TARGET to 12.6"
+          echo "MACOSX_DEPLOYMENT_TARGET=12.6" >> $GITHUB_ENV
+          echo "Adding SDKROOT to GITHUB_ENV"
+          echo "SDKROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk" >> $GITHUB_ENV
+
+          #echo CC=$(brew --prefix llvm@14)/bin/clang >> $GITHUB_ENV
+          #echo CXX=$(brew --prefix llvm@14)/bin/clang++  >> $GITHUB_ENV
+
+        elif [ "$RUNNER_OS" == "Windows" ]; then
+          choco install ninja
+          # C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise
+          MSVC_DIR=$(cmd.exe /c "vswhere -products * -requires Microsoft.Component.MSBuild -property installationPath -latest")
+          echo "Latest is: $MSVC_DIR"
+          echo "MSVC_DIR=$MSVC_DIR" >> $GITHUB_ENV
+          # add folder containing vcvarsall.bat
+          echo "$MSVC_DIR\VC\Auxiliary\Build" >> $GITHUB_PATH
+        fi;
+
+        echo "Python_ROOT_DIR=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/x64/" >> $GITHUB_ENV
+
+    - name: Install conan
+      shell: bash
+      run: |
+          python --version
+          pip install conan
+          conan --version
+          echo "Enabling conan revisions and setting parallel_download"
+          conan config set general.revisions_enabled=True
+          conan config set general.parallel_download=8
+          conan profile new --detect default
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            conan profile update settings.compiler.libcxx=libstdc++11 default
+          fi;
+
+    - name: CMake configure and build (Unix)
+      working-directory: ./build
+      if: runner.os != 'Windows'
+      shell: bash
+      run: |
+        set -x
+        cmake -G Ninja -DCMAKE_BUILD_TYPE:STRING=Debug \
+              -DUSE_PYTHON_ENGINE:BOOL=ON -DUSE_RUBY_ENGINE:BOOL=ON \
+              -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
+              -DPython_ROOT_DIR:PATH=${{ env.Python_ROOT_DIR }} \
+              -DCPACK_BINARY_TGZ:BOOL=ON \
+              -DCPACK_BINARY_IFW:BOOL=OFF -DCPACK_BINARY_RPM:BOOL=OFF -DCPACK_BINARY_DEB:BOOL=OFF -DCPACK_BINARY_NSIS:BOOL=OFF \
+              -DCPACK_BINARY_STGZ:BOOL=OFF -DCPACK_BINARY_TBZ2:BOOL=OFF -DCPACK_BINARY_TXZ:BOOL=OFF -DCPACK_BINARY_TZ:BOOL=OFF \
+              ../
+        ninja
+
+    - name: CMake configure and build (Windows)
+      working-directory: ./build
+      if: runner.os == 'Windows'
+      shell: cmd
+      run: |
+        echo "Using vcvarsall to initialize the development environment"
+        call vcvarsall.bat x64
+        cmake -G Ninja -DCMAKE_BUILD_TYPE:STRING=Release ^
+              -DUSE_PYTHON_ENGINE:BOOL=ON -DUSE_RUBY_ENGINE:BOOL=ON ^
+              -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} ^
+              -DPython_ROOT_DIR:PATH=${{ env.Python_ROOT_DIR }} ^
+              -DCPACK_BINARY_TGZ:BOOL=ON ^
+              -DCPACK_BINARY_IFW:BOOL=OFF -DCPACK_BINARY_RPM:BOOL=OFF -DCPACK_BINARY_DEB:BOOL=OFF -DCPACK_BINARY_NSIS:BOOL=OFF ^
+              -DCPACK_BINARY_STGZ:BOOL=OFF -DCPACK_BINARY_TBZ2:BOOL=OFF -DCPACK_BINARY_TXZ:BOOL=OFF -DCPACK_BINARY_TZ:BOOL=OFF ^
+              ../
+        ninja
+
+    - name: Run Tests
+      shell: bash
+      working-directory: ./build
+      run: |
+        Products/openstudio
+
+
+#    - name: Archive TGZ artifacts
+#      uses: actions/upload-artifact@v3
+#      with:
+#          name: OpenStudioLabs-${{ github.sha }}-${{ matrix.os }}.tar.gz
+#          path: build/_CPack_Packages/${{ matrix.PLATFORM_NAME }}/TGZ/*.tar.gz
+#
+#    - name: Upload TGZ installer to release
+#      if: contains(github.ref, 'refs/tags')
+#      uses: svenstaro/upload-release-action@v2
+#      with:
+#        repo_token: ${{ secrets.GITHUB_TOKEN }}
+#        file: build/_CPack_Packages/${{ matrix.PLATFORM_NAME }}/TGZ/*.tar.gz
+#        tag: ${{ github.ref }}
+#        overwrite: true
+#        file_glob: true

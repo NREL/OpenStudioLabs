@@ -9,18 +9,19 @@ class Runner
 {
  public:
   virtual ~Runner() = default;
-  Runner &operator=(Runner &&) = delete;
-  Runner &operator=(const Runner &) = delete;
-  Runner(Runner &&) = delete;
-  Runner(const Runner &) = delete;
+  Runner& operator=(Runner&&) = delete;
+  Runner& operator=(const Runner&) = delete;
+  Runner(Runner&&) = delete;
+  Runner(const Runner&) = delete;
   Runner() = delete;
   Runner(Model model) : model_(std::move(model)) {}
 
-  Model &get_current_model() { return model_; }
+  Model& get_current_model() {
+    return model_;
+  }
 
  private:
   Model model_;
-
 };
 
 }  // namespace openstudio

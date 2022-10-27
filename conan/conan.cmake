@@ -76,6 +76,10 @@ macro(FindValue ValueName)
 endmacro()
 
 FindValue(CONAN_SWIG_ROOT)
+set(SWIG_EXECUTABLE "${CURRENT_CONAN_SWIG_ROOT}/bin/swig")
 set(SWIG_LIB "${CURRENT_CONAN_SWIG_ROOT}/bin/swiglib")
-find_package(SWIG REQUIRED COMPONENTS python ruby csharp)
-include(${SWIG_USE_FILE})
+set(SWIG_DIR "${CURRENT_CONAN_SWIG_ROOT}/bin/swiglib")
+
+# find_package(SWIG REQUIRED COMPONENTS python ruby csharp)
+# include(${SWIG_USE_FILE})
+include(UseSWIG)

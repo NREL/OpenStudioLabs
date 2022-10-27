@@ -18,7 +18,7 @@ void init() {
   Init_openstudio();
 }
 
-} // ruby
-} // openstudio
+}  // namespace ruby
+}  // namespace openstudio
 
-#endif // openstudio_ruby_init_included
+#endif  // openstudio_ruby_init_included

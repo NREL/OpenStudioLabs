@@ -17,9 +17,10 @@ endif()
 
 target_link_libraries(
   openstudio
-  openstudiolib
-  config
-  scripting
-  cpp_compile_options
-  CONAN_PKG::fmt
+  PRIVATE
+    openstudiolib
+    config
+    scripting
+    cpp_compile_options
+    CONAN_PKG::fmt
 )

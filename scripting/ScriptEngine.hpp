@@ -21,9 +21,7 @@ struct ScriptObject
 class ScriptEngine
 {
  public:
-  ScriptEngine() {
-    registerType<openstudio::Measure*>("openstudio::Measure *");
-  }
+  ScriptEngine(int argc, char* argv[]) {}
 
   virtual ~ScriptEngine() = default;
   ScriptEngine(const ScriptEngine&) = delete;
@@ -69,7 +67,7 @@ class ScriptEngine
  private:
   struct Compare
   {
-    bool operator()(const std::reference_wrapper<const std::type_info> &lhs, const std::reference_wrapper<const std::type_info>& rhs) const {
+    bool operator()(const std::reference_wrapper<const std::type_info>& lhs, const std::reference_wrapper<const std::type_info>& rhs) const {
       return lhs.get().before(rhs.get());
     }
   };
@@ -77,8 +75,8 @@ class ScriptEngine
   std::map<std::reference_wrapper<const std::type_info>, std::string, Compare> types;
 };
 
-}  // namespace epenstudio
+}  // namespace openstudio
 
-typedef openstudio::ScriptEngine* ScriptEngineFactoryType (const int argc, const char* argv[]);
+using ScriptEngineFactoryType = openstudio::ScriptEngine*(const int argc, const char* argv[]);
 
 #endif

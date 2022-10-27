@@ -3,11 +3,13 @@
 # **Only** find static libs
 set(Python_USE_STATIC_LIBS FALSE)
 
-find_package(
-  Python
-  COMPONENTS Interpreter Development
-  REQUIRED
-)
+set(Python_REQUIRED_VERSION "" CACHE STRING "The specific Python version you want to link to (Optional)")
+mark_as_advanced(Python_REQUIRED_VERSION)
+if(Python_REQUIRED_VERSION)
+  find_package(Python ${Python_REQUIRED_VERSION} EXACT COMPONENTS Interpreter Development REQUIRED)
+else()
+  find_package(Python COMPONENTS Interpreter Development REQUIRED)
+endif()
 
 set_source_files_properties(
   ../scripting/OpenStudio.i
@@ -20,6 +22,11 @@ swig_add_library(
   LANGUAGE python
   OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}
   SOURCES ../scripting/OpenStudio.i
+)
+
+target_compile_options(pythonbindings PRIVATE
+  "$<${is_msvc_genex}:/wd4996>"
+  "$<${is_gnu_or_clang_genex}:-Wno-deprecated-declarations>"
 )
 
 set_target_properties(pythonbindings
@@ -62,8 +69,22 @@ add_library(
 
 target_include_directories(pythonengine INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/engine)
 target_include_directories(pythonengine PRIVATE ${PROJECT_BINARY_DIR})
-
+target_compile_options(pythonengine PRIVATE
+  "$<${is_msvc_genex}:/wd4996>"
+  "$<${is_gnu_or_clang_genex}:-Wno-deprecated-declarations>"
+)
 target_link_libraries(
   pythonengine
-  PRIVATE pythonbindings openstudiolib Python::Python cpp_compile_options CONAN_PKG::zlib
+  PRIVATE
+	pythonbindings
+	openstudiolib
+	Python::Python
+	cpp_compile_options
+	CONAN_PKG::zlib
 )
+
+target_compile_definitions(pythonengine PRIVATE openstudio_scriptengine_EXPORTS SHARED_OS_LIBS)
+
+if (APPLE)
+  set_target_properties(pythonengine PROPERTIES SUFFIX ".so")
+endif()

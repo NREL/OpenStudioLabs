@@ -18,16 +18,22 @@
 #  pragma GCC diagnostic pop
 #endif
 
+// TODO: We need to revisit this static initialization stuff
+static int argc = 0;
+static char** argv = nullptr;
+
 unsigned init() {
+  ruby_sysinit(&argc, &argv);
   ruby_setup();
-  return 0;
+  return 0u;
 }
 
-static auto i = init();
+static unsigned i = init();
 
 namespace openstudio {
 
-RubyEngine::RubyEngine() {
+RubyEngine::RubyEngine(int argc, char* argv[]) : ScriptEngine(argc, argv) {
+  ruby_set_argv(argc, argv);
   openstudio::ruby::init();
 }
 
@@ -95,22 +101,20 @@ void* RubyEngine::getAs_impl(ScriptObject& obj, const std::type_info& ti) {
 
 extern "C"
 {
-  openstudio::ScriptEngine* makeScriptEngine([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
-    return new openstudio::RubyEngine();
+  openstudio::ScriptEngine* makeScriptEngine(int argc, char* argv[]) {
+    return new openstudio::RubyEngine(argc, argv);
+  }
+
+  int rb_hasFile(const char* /*t_filename*/) {
+    // TODO Consider expanding this to use the path which we have artificially defined in embedded_help.rb
+    // std::string expandedName = std::string(":/ruby/2.7.0/") + std::string(t_filename) + ".rb";
+    // return embedded_files::hasFile(expandedName);
+    return 0;
+  }
+
+  int rb_require_embedded(const char* t_filename) {
+    std::string require_script = R"(require ')" + std::string(t_filename) + R"(')";
+    openstudio::evalString(require_script);
+    return 0;
   }
 }
-
-//extern "C"
-//{
-//  int rb_hasFile(const char* t_filename) {
-//    // TODO Consider expanding this to use the path which we have artificially defined in embedded_help.rb
-//    std::string expandedName = std::string(":/ruby/2.7.0/") + std::string(t_filename) + ".rb";
-//    return embedded_files::hasFile(expandedName);
-//  }
-//
-//  int rb_require_embedded(const char* t_filename) {
-//    std::string require_script = R"(require ')" + std::string(t_filename) + R"(')";
-//    Test::evalString(require_script);
-//    return 0;
-//  }
-//}

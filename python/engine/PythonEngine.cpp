@@ -8,6 +8,7 @@
 #endif
 
 #include <Python.h>
+
 #include "OpenStudioPYTHON_wrap.cxx"
 #include "embedded_files.hxx"
 
@@ -17,7 +18,7 @@
 
 namespace openstudio {
 
-PythonEngine::PythonEngine([[maybe_unused]] const int argc, const char* argv[]) : program(Py_DecodeLocale("python3.7", nullptr)) {
+PythonEngine::PythonEngine([[maybe_unused]] int argc, char* argv[]) : ScriptEngine(argc, argv), program(Py_DecodeLocale("python3.7", nullptr)) {
   PyImport_AppendInittab("_pythonbindings", SWIG_init);
 
   Py_SetProgramName(program);  // optional but recommended
@@ -32,31 +33,29 @@ PythonEngine::~PythonEngine() {
   PyMem_RawFree(program);
 }
 
-struct PythonObject {
+struct PythonObject
+{
   PythonObject() = default;
 
-  PythonObject(PyObject *obj) noexcept : obj_(obj)
-  {
+  explicit PythonObject(PyObject* obj) noexcept : obj_(obj) {
     if (obj_) {
       Py_INCREF(obj_);
     }
   }
 
-  PythonObject(const PythonObject &other) noexcept
-   : obj_(other.obj_) {
+  PythonObject(const PythonObject& other) noexcept : obj_(other.obj_) {
     if (obj_) {
       Py_INCREF(obj_);
     }
   }
 
-  PythonObject(PythonObject &&other) noexcept
-    : obj_(other.obj_) {
+  PythonObject(PythonObject&& other) noexcept : obj_(other.obj_) {
     // no reason to inc/dec, we just stole the ref counted object
     // from other
     other.obj_ = nullptr;
   }
 
-  PythonObject &operator=(const PythonObject &rhs) noexcept {
+  PythonObject& operator=(const PythonObject& rhs) noexcept {
     if (&rhs != this) {
       obj_ = rhs.obj_;
 
@@ -68,7 +67,7 @@ struct PythonObject {
     return *this;
   }
 
-  PythonObject &operator=(PythonObject &&rhs) noexcept {
+  PythonObject& operator=(PythonObject&& rhs) noexcept {
     if (&rhs != this) {
       obj_ = rhs.obj_;
       rhs.obj_ = nullptr;
@@ -83,7 +82,7 @@ struct PythonObject {
     }
   }
 
-  PyObject *obj_ = nullptr;
+  PyObject* obj_ = nullptr;
 };
 
 void PythonEngine::exec(std::string_view sv) {
@@ -98,10 +97,10 @@ void PythonEngine::exec(std::string_view sv) {
 
   std::string fileContent = embedded_files::getFileAsString(":/python/openstudio.py");
 
-  PyObject *builtins = PyEval_GetBuiltins();
-  PyObject *compile = PyDict_GetItemString(builtins, "compile");
-  PyObject *code = PyObject_CallFunction(compile, "sss", fileContent.c_str(), "openstudio.py", "exec");
-  PyObject *pyModule = PyImport_ExecCodeModule("openstudio", code);
+  PyObject* builtins = PyEval_GetBuiltins();
+  PyObject* compile = PyDict_GetItemString(builtins, "compile");
+  PyObject* code = PyObject_CallFunction(compile, "sss", fileContent.c_str(), "openstudio.py", "exec");
+  PyObject* pyModule = PyImport_ExecCodeModule("openstudio", code);
 
   PyObject* v = PyRun_String(command.c_str(), Py_file_input, globalDict, globalDict);
   if (v == nullptr) {
@@ -110,7 +109,7 @@ void PythonEngine::exec(std::string_view sv) {
   }
 
   Py_DECREF(v);
-  Py_DecRef( pyModule ) ;
+  Py_DecRef(pyModule);
 }
 
 ScriptObject PythonEngine::eval(std::string_view sv) {
@@ -122,8 +121,6 @@ ScriptObject PythonEngine::eval(std::string_view sv) {
   }
 
   PyObject* d = PyModule_GetDict(m);
-
-  std::string fileContent = embedded_files::getFileAsString(":/python/openstudio.py");
 
   PyObject* v = PyRun_String(command.c_str(), Py_eval_input, d, d);
   if (v == nullptr) {
@@ -165,3 +162,10 @@ void* PythonEngine::getAs_impl(ScriptObject& obj, const std::type_info& ti) {
   return return_value;
 }
 }  // namespace openstudio
+
+extern "C"
+{
+  openstudio::ScriptEngine* makeScriptEngine(int argc, char* argv[]) {
+    return new openstudio::PythonEngine(argc, argv);
+  }
+}

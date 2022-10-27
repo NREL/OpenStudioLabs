@@ -12,7 +12,7 @@ if(HAVE_UNISTD_H)
 endif()
 
 if(MSVC)
-  target_compile_options(cpp_warning_options INTERFACE /W4 /Werror)
+  target_compile_options(cpp_warning_options INTERFACE /W4 /WX)
 else()
   target_compile_options(cpp_warning_options INTERFACE -Wall -Wextra -Wconversion -Werror -Wno-unused-variable)
   target_compile_options(cpp_compile_options INTERFACE -fPIC)
@@ -47,3 +47,10 @@ set(LIBRARY_SEARCH_DIRECTORY
 configure_file(config/config.hxx.in config/config.hxx)
 add_library(config INTERFACE)
 target_include_directories(config INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/config)
+
+#######################################################################
+#             G E N E R A T O R    E X P R E S S I O N S              #
+#######################################################################
+
+set(is_msvc_genex "$<CXX_COMPILER_ID:MSVC>")
+set(is_gnu_or_clang_genex "$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>")
