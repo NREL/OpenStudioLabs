@@ -6,21 +6,21 @@
 #include "ModelObject.hpp"
 
 namespace openstudio {
-  class Model
-  {
-    public:
-      explicit Model();
-      std::string toString() const;
+class Model
+{
+ public:
+  explicit Model();
+  std::string toString() const;
 
-    protected:
-      friend class ModelObject;
+ protected:
+  friend class ModelObject;
 
-      void addModelObject(ModelObject modelObject);
+  void addModelObject(ModelObject modelObject);
 
-    private:
-      class Impl;
-      std::shared_ptr<Impl> impl;
-  };
+ private:
+  class Impl;
+  std::shared_ptr<Impl> impl;
+};
 }  // namespace openstudio
 
 #endif

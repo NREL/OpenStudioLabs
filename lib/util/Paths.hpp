@@ -9,6 +9,6 @@ std::filesystem::path getCurrentModulePath();
 
 std::filesystem::path getCurrentModuleDir();
 
-} // namespace openstudio
+}  // namespace openstudio
 
-#endif // openstudio_paths_included
+#endif  // openstudio_paths_included

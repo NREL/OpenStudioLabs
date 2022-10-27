@@ -83,4 +83,3 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   fmt::print("Now the model is populated from {}\n", engines);
   fmt::print("\n-----\n{}\n-----\n", m.toString());
 }
-

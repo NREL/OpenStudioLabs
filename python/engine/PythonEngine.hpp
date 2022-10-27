@@ -30,10 +30,11 @@ class PythonEngine final : public ScriptEngine
 
 }  // namespace openstudio
 
-extern "C" {
-openstudio::ScriptEngine* makeScriptEngine(const int argc, const char* argv[]) {
-  return new openstudio::PythonEngine(argc, argv);
-}
+extern "C"
+{
+  openstudio::ScriptEngine* makeScriptEngine(const int argc, const char* argv[]) {
+    return new openstudio::PythonEngine(argc, argv);
+  }
 }
 
 #endif
