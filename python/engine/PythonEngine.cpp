@@ -36,7 +36,7 @@ struct PythonObject
 {
   PythonObject() = default;
 
-  PythonObject(PyObject* obj) noexcept : obj_(obj) {
+  explicit PythonObject(PyObject* obj) noexcept : obj_(obj) {
     if (obj_) {
       Py_INCREF(obj_);
     }
@@ -120,8 +120,6 @@ ScriptObject PythonEngine::eval(std::string_view sv) {
   }
 
   PyObject* d = PyModule_GetDict(m);
-
-  std::string fileContent = embedded_files::getFileAsString(":/python/openstudio.py");
 
   PyObject* v = PyRun_String(command.c_str(), Py_eval_input, d, d);
   if (v == nullptr) {
