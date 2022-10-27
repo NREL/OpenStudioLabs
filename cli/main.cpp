@@ -2,6 +2,7 @@
 #include <fmt/format.h>
 #include "ScriptEngine.hpp"
 #include "Measure.hpp"
+#include "OSArgument.hpp"
 #include "Runner.hpp"
 #include "Model.hpp"
 #include "DynamicLibrary.hpp"
@@ -34,7 +35,7 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   openstudio::util::DynamicLibrary pythonEngineLib(openstudio::getCurrentModuleDir() / getSharedModuleName("pythonengine"));
   const std::function<ScriptEngineFactoryType> pythonFactory = pythonEngineLib.load_symbol<ScriptEngineFactoryType>("makeScriptEngine");
   const std::unique_ptr<openstudio::ScriptEngine> pythonEngine(pythonFactory(argc, argv));
-  pythonEngine->registerType<openstudio::Measure*>("openstudio::Measure *");
+  pythonEngine->registerType<openstudio::PythonMeasure*>("openstudio::PythonMeasure *");
   // Python works!
   pythonEngine->exec(R"(print("Hello From Python"))");
 #endif
@@ -57,8 +58,30 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   pythonEngine->exec(fmt::format("import sys\nsys.path.append('{}')", pythonMeasurePath.string()));
   pythonEngine->exec("import test_measure");
   auto python_measure_pointer = pythonEngine->eval("test_measure.PythonTestMeasure()");
-  auto* python_measure = pythonEngine->getAs<openstudio::Measure*>(python_measure_pointer);
+  auto* python_measure = pythonEngine->getAs<openstudio::PythonMeasure*>(python_measure_pointer);
   fmt::print("\nPython measure name: {}\n", python_measure->name());
+#endif
+
+  fmt::print("\n\n========== Computing Arguments ==========\n");
+
+  openstudio::Model modelClone;
+
+#if USE_RUBY_ENGINE
+  std::vector<openstudio::OSArgument> rubyArgs = ruby_measure->arguments(modelClone);
+  openstudio::OSArgumentMap rubyArgMap;
+  for (const auto& arg : rubyArgs) {
+    std::cout << "Ruby arg: " << arg << '\n';
+    rubyArgMap[arg.name()] = arg.clone();
+  }
+#endif
+
+#if USE_PYTHON_ENGINE
+  std::vector<openstudio::OSArgument> pythonArgs = python_measure->arguments(modelClone);
+  openstudio::OSArgumentMap pythonArgMap;
+  for (const auto& arg : pythonArgs) {
+    std::cout << "Python arg: " << arg << '\n';
+    pythonArgMap[arg.name()] = arg.clone();
+  }
 #endif
 
   fmt::print("\n\n========== Running Measures ==========\n");
@@ -75,12 +98,12 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
 
 #if USE_RUBY_ENGINE
   fmt::print("ruby_measure->run\n");
-  ruby_measure->run(runner);
+  ruby_measure->run(m, runner, rubyArgMap);
 #endif
 
 #if USE_PYTHON_ENGINE
   fmt::print("python_measure->run\n");
-  python_measure->run(runner);
+  python_measure->run(m, runner, pythonArgMap);
 #endif
 
   fmt::print("Now the model is populated from {}\n", engines);

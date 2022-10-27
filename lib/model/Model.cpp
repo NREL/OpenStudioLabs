@@ -2,13 +2,14 @@
 #include "ModelObject.hpp"
 #include <sstream>
 #include <iostream>
+#include <utility>
 
 namespace openstudio {
 class Model::Impl
 {
  public:
   void addModelObject(ModelObject modelObject) {
-    objects.push_back(modelObject);
+    objects.emplace_back(std::move(modelObject));
   }
 
   std::string toString() const {
@@ -30,7 +31,7 @@ class Model::Impl
 Model::Model() : impl{std::make_shared<Impl>()} {}
 
 void Model::addModelObject(ModelObject modelObject) {
-  impl->addModelObject(modelObject);
+  impl->addModelObject(std::move(modelObject));
 }
 
 std::string Model::toString() const {

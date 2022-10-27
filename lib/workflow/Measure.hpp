@@ -1,17 +1,20 @@
 #ifndef MEASURE_HPP
 #define MEASURE_HPP
 
+#include "MeasureAPI.hpp"
+
+#include <map>
 #include <string>
-#include <string_view>
-#include <iostream>
 #include <vector>
 
 namespace openstudio {
 
 class Runner;
 class Model;
+class OSArgument;
+using OSArgumentMap = std::map<std::string, OSArgument>;
 
-class Measure
+class MEASURE_API Measure
 {
  public:
   Measure() = default;
@@ -22,7 +25,23 @@ class Measure
   virtual ~Measure() = default;
 
   virtual std::string name() = 0;
-  virtual bool run(Runner&) = 0;
+  virtual std::vector<OSArgument> arguments(const Model& model) const;
+  virtual bool run(Model& model, Runner& runner, const OSArgumentMap& user_arguments) const;
+};
+
+class MEASURE_API PythonMeasure
+{
+ public:
+  PythonMeasure() = default;
+  PythonMeasure(const PythonMeasure&) = delete;
+  PythonMeasure(PythonMeasure&&) = delete;
+  PythonMeasure& operator=(const PythonMeasure&) = delete;
+  PythonMeasure& operator=(PythonMeasure&&) = delete;
+  virtual ~PythonMeasure() = default;
+
+  virtual std::string name() = 0;
+  virtual std::vector<OSArgument> arguments(const Model& model) const = 0;
+  virtual bool run(Model& model, Runner& runner, const OSArgumentMap& user_arguments) const;
 };
 
 }  // Namespace openstudio

@@ -23,4 +23,5 @@ target_link_libraries(
     scripting
     cpp_compile_options
     CONAN_PKG::fmt
+    workflow
 )
