@@ -17,3 +17,7 @@ target_link_libraries(workflow PRIVATE
 )
 
 target_compile_definitions(workflow PRIVATE openstudio_measure_EXPORTS SHARED_OS_LIBS)
+if(WIN32)
+  #class 'std::optional<std::string>' needs to have dll-interface to be used by clients of class 'openstudio::OSArgument'
+  target_compile_options(workflow PRIVATE /wd4251)
+endif()
