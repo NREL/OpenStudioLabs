@@ -18,7 +18,7 @@
 
 namespace openstudio {
 
-PythonEngine::PythonEngine([[maybe_unused]] const int argc, const char* argv[]) : program(Py_DecodeLocale("python3.7", nullptr)) {
+PythonEngine::PythonEngine([[maybe_unused]] int argc, char* argv[]) : ScriptEngine(argc, argv), program(Py_DecodeLocale("python3.7", nullptr)) {
   PyImport_AppendInittab("_pythonbindings", SWIG_init);
 
   Py_SetProgramName(program);  // optional but recommended
@@ -165,7 +165,7 @@ void* PythonEngine::getAs_impl(ScriptObject& obj, const std::type_info& ti) {
 
 extern "C"
 {
-  openstudio::ScriptEngine* makeScriptEngine(const int argc, const char* argv[]) {
+  openstudio::ScriptEngine* makeScriptEngine(int argc, char* argv[]) {
     return new openstudio::PythonEngine(argc, argv);
   }
 }

@@ -10,7 +10,7 @@ namespace openstudio {
 class PythonEngine final : public ScriptEngine
 {
  public:
-  PythonEngine(const int argc, const char* argv[]);
+  PythonEngine(int argc, char* argv[]);
   ~PythonEngine() override;
 
   PythonEngine(const PythonEngine&) = delete;
@@ -34,7 +34,7 @@ class PythonEngine final : public ScriptEngine
 
 extern "C"
 {
-  SCRIPTENGINE_API openstudio::ScriptEngine* makeScriptEngine(const int argc, const char* argv[]);
+  SCRIPTENGINE_API openstudio::ScriptEngine* makeScriptEngine(int argc, char* argv[]);
 }
 
 #endif

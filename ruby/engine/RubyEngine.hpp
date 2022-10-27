@@ -9,7 +9,7 @@ namespace openstudio {
 class RubyEngine final : public ScriptEngine
 {
  public:
-  RubyEngine();
+  RubyEngine(int argc = 0, char* argv[] = nullptr);
   ~RubyEngine() override;
 
   RubyEngine(const RubyEngine&) = delete;
@@ -30,7 +30,7 @@ class RubyEngine final : public ScriptEngine
 
 extern "C"
 {
-  SCRIPTENGINE_API openstudio::ScriptEngine* makeScriptEngine([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]);
+  SCRIPTENGINE_API openstudio::ScriptEngine* makeScriptEngine(int argc, char* argv[]);
 }
 
 #endif

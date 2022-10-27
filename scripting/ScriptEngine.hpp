@@ -21,7 +21,7 @@ struct ScriptObject
 class ScriptEngine
 {
  public:
-  ScriptEngine() {}
+  ScriptEngine(int argc, char * argv[]) {}
 
   virtual ~ScriptEngine() = default;
   ScriptEngine(const ScriptEngine&) = delete;

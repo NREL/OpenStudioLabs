@@ -18,16 +18,22 @@
 #  pragma GCC diagnostic pop
 #endif
 
+// TODO: We need to revisit this static initialization stuff
+static int argc = 0;
+static char** argv = nullptr;
+
 unsigned init() {
+  ruby_sysinit(&argc, &argv);
   ruby_setup();
-  return 0;
+  return 0u;
 }
 
-static auto i = init();
+static unsigned i = init();
 
 namespace openstudio {
 
-RubyEngine::RubyEngine() {
+RubyEngine::RubyEngine(int argc, char* argv[]) : ScriptEngine(argc, argv) {
+  ruby_set_argv(argc, argv);
   openstudio::ruby::init();
 }
 
@@ -95,8 +101,8 @@ void* RubyEngine::getAs_impl(ScriptObject& obj, const std::type_info& ti) {
 
 extern "C"
 {
-  openstudio::ScriptEngine* makeScriptEngine([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
-    return new openstudio::RubyEngine();
+  openstudio::ScriptEngine* makeScriptEngine(int argc, char* argv[]) {
+    return new openstudio::RubyEngine(argc, argv);
   }
 
   int rb_hasFile(const char* /*t_filename*/) {
