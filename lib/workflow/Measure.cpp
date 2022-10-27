@@ -14,4 +14,9 @@ bool Measure::run(Model& /* model */, Runner& /*runner*/, const OSArgumentMap& /
   return true;
 }
 
+bool PythonMeasure::run(Model& /* model */, Runner& /*runner*/, const OSArgumentMap& /*user_arguments*/) const {
+  fmt::print("Base class PythonMeasure::run called");
+  return true;
+}
+
 }  // namespace openstudio

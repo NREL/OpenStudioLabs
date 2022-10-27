@@ -35,7 +35,7 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   openstudio::util::DynamicLibrary pythonEngineLib(openstudio::getCurrentModuleDir() / getSharedModuleName("pythonengine"));
   const std::function<ScriptEngineFactoryType> pythonFactory = pythonEngineLib.load_symbol<ScriptEngineFactoryType>("makeScriptEngine");
   const std::unique_ptr<openstudio::ScriptEngine> pythonEngine(pythonFactory(argc, argv));
-  pythonEngine->registerType<openstudio::Measure*>("openstudio::Measure *");
+  pythonEngine->registerType<openstudio::PythonMeasure*>("openstudio::PythonMeasure *");
   // Python works!
   pythonEngine->exec(R"(print("Hello From Python"))");
 #endif
@@ -58,7 +58,7 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   pythonEngine->exec(fmt::format("import sys\nsys.path.append('{}')", pythonMeasurePath.string()));
   pythonEngine->exec("import test_measure");
   auto python_measure_pointer = pythonEngine->eval("test_measure.PythonTestMeasure()");
-  auto* python_measure = pythonEngine->getAs<openstudio::Measure*>(python_measure_pointer);
+  auto* python_measure = pythonEngine->getAs<openstudio::PythonMeasure*>(python_measure_pointer);
   fmt::print("\nPython measure name: {}\n", python_measure->name());
 #endif
 

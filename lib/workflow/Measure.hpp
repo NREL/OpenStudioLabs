@@ -29,6 +29,21 @@ class MEASURE_API Measure
   virtual bool run(Model& model, Runner& runner, const OSArgumentMap& user_arguments) const;
 };
 
+class MEASURE_API PythonMeasure
+{
+ public:
+  PythonMeasure() = default;
+  PythonMeasure(const PythonMeasure&) = delete;
+  PythonMeasure(PythonMeasure&&) = delete;
+  PythonMeasure& operator=(const PythonMeasure&) = delete;
+  PythonMeasure& operator=(PythonMeasure&&) = delete;
+  virtual ~PythonMeasure() = default;
+
+  virtual std::string name() = 0;
+  virtual std::vector<OSArgument> arguments(const Model& model) const = 0;
+  virtual bool run(Model& model, Runner& runner, const OSArgumentMap& user_arguments) const;
+};
+
 }  // Namespace openstudio
 
 #endif  // ifndef MEASURE_HPP

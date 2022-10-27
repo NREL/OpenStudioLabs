@@ -33,9 +33,13 @@
 %include <std_string.i>
 %include <std_vector.i>
 
-#if defined(SWIGPYTHON)
+#if defined(SWIGRUBY)
+  %ignore openstudio::PythonMeasure;
+#elif defined(SWIGPYTHON)
   // Avoid triggering a SWIG warning: 'print' is a python keyword
   %rename(toString) openstudio::OSArgument::print;
+
+  %ignore openstudio::Measure;
 #endif
 
 %{
@@ -45,6 +49,13 @@
   #include <Runner.hpp>
   #include <Measure.hpp>
 %}
+
+#if defined(SWIGPYTHON)
+  %feature("director") PythonMeasure;
+  %rename (Measure) openstudio::PythonMeasure;
+#else
+  %feature("director") Measure;
+#endif
 
 %feature("director") Model;
 %feature("director") Measure;
