@@ -58,7 +58,7 @@ IndentCaseLabels: true
 IndentWidth: 2
 IndentPPDirectives: AfterHash
 IndentWrappedFunctionNames: true
-NamespaceIndentation:  Inner
+NamespaceIndentation: None # Could consider Inner
 PenaltyBreakAssignment: 2
 PenaltyBreakBeforeFirstCallParameter: 19
 PenaltyBreakComment: 300
@@ -85,8 +85,7 @@ SpacesInCStyleCastParentheses: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
 SortIncludes: false
-SortUsingDeclarations: false
-Standard: Cpp11
+SortUsingDeclarations: true
+Standard: c++20
 TabWidth: 2
 UseTab: Never
-...
