@@ -1,23 +1,31 @@
 # Conan
 
-set(CMAKE_CONAN_EXPECTED_HASH 170c3250029af321395135a3952a9045)
-set(CMAKE_CONAN_VERSION "v0.16.1")
+set(CMAKE_CONAN_EXPECTED_HASH
+    5cdb3042632da3efff558924eecefd580a0e786863a857ca097c3d1d43df5dcd)
+set(CMAKE_CONAN_VERSION "0.18.1")
 
 if(EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
-  file(MD5 "${CMAKE_BINARY_DIR}/conan.cmake" CMAKE_CONAN_HASH)
-endif()
-if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake" OR NOT "${CMAKE_CONAN_HASH}" MATCHES "${CMAKE_CONAN_EXPECTED_HASH}")
+  file(SHA256 "${CMAKE_BINARY_DIR}/conan.cmake" CMAKE_CONAN_HASH)
+elseif(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake"
+       OR NOT "${CMAKE_CONAN_HASH}" MATCHES "${CMAKE_CONAN_EXPECTED_HASH}")
   # Put it in CMAKE_BINARY_DIR so we don't end up with two when building OpenStudioApplication
-  message(STATUS "Downloading conan.cmake ${CMAKE_CONAN_VERSION} from https://github.com/conan-io/cmake-conan")
-  file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/${CMAKE_CONAN_VERSION}/conan.cmake"
-     "${CMAKE_BINARY_DIR}/conan.cmake")
+  message(
+    STATUS
+      "Downloading conan.cmake ${CMAKE_CONAN_VERSION} from https://github.com/conan-io/cmake-conan"
+  )
+  file(
+    DOWNLOAD
+    "https://raw.githubusercontent.com/conan-io/cmake-conan/${CMAKE_CONAN_VERSION}/conan.cmake"
+    "${CMAKE_BINARY_DIR}/conan.cmake"
+    EXPECTED_HASH SHA256=${CMAKE_CONAN_EXPECTED_HASH}
+    TLS_VERIFY ON)
 else()
-  message(STATUS "Using existing conan.cmake")
+  message(STATUS "openstudio: using existing conan.cmake")
 endif()
 
 include(${CMAKE_BINARY_DIR}/conan.cmake)
 
-conan_check(VERSION 1.28.0 REQUIRED)
+conan_check(VERSION 1.48.0 REQUIRED)
 
 message(STATUS "openstudio: RUNNING CONAN")
 
@@ -41,12 +49,11 @@ if (NOT "${CONAN_REV_STATUS}" STREQUAL "True")
 endif()
 
 conan_cmake_run(REQUIRES
-  "openstudio_ruby/2.7.2@nrel/testing#dcea3703b5dfaecfa5f0056d952ea5bd"
-  "minizip/1.2.12#0b5296887a2558500d0323c6c94c8d02"
-  "zlib/1.2.12#3b9e037ae1c615d045a06c67d88491ae"
-  "minizip/1.2.12#0b5296887a2558500d0323c6c94c8d02"
-  "fmt/7.0.1#0580b1492b1dddb43b1768e68f25c43c"
-  "swig/4.0.2#bfafb16cd2bea6af3b8003163abcbd09"
+  "openstudio_ruby/2.7.2@nrel/testing#d66e3b66568b13acf3b16d866bec68d0"
+  "minizip/1.2.12#0b5296887a2558500d0323c6c94c8d02" # This depends on zlib, and basically patches it
+  "zlib/1.2.12#3b9e037ae1c615d045a06c67d88491ae" # Also needed, so we can find zlib.h and co (+ pinning exactly is good) "minizip/1.2.12#0b5296887a2558500d0323c6c94c8d02"
+  "fmt/8.1.1#b3e969f8561a85087bd0365c09bbf4fb"
+  "swig/4.0.2#9fcccb1e39eed9acd53a4363d8129be5"
   BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS
   BUILD missing
   # Passes `-u, --update`    to conan install: Check updates exist from upstream remotes

@@ -7,9 +7,9 @@ add_executable(
 
 target_link_libraries(
   openstudio
-  openstudiolib 
+  openstudiolib
   config
   scripting
   cpp_compile_options
-  CONAN_PKG::fmt 
+  CONAN_PKG::fmt
 )

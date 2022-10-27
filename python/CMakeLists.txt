@@ -17,7 +17,7 @@ set_source_files_properties(
 
 swig_add_library(
   pythonbindings TYPE STATIC
-  LANGUAGE python 
+  LANGUAGE python
   OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}
   SOURCES ../scripting/OpenStudio.i
 )
@@ -28,7 +28,7 @@ set_target_properties(pythonbindings
 )
 
 target_include_directories(
-  pythonbindings 
+  pythonbindings
   INTERFACE ${CMAKE_CURRENT_BINARY_DIR}
   PRIVATE ${Python_INCLUDE_DIRS}
 )

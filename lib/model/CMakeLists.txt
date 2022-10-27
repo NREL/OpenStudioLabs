@@ -3,7 +3,7 @@
 add_library(model OBJECT
   Model.hpp
   Model.cpp
-  ModelObject.hpp 
+  ModelObject.hpp
   ModelObject.cpp
 )
 
