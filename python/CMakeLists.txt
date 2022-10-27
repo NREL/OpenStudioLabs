@@ -3,11 +3,13 @@
 # **Only** find static libs
 set(Python_USE_STATIC_LIBS FALSE)
 
-find_package(
-  Python
-  COMPONENTS Interpreter Development
-  REQUIRED
-)
+set(Python_REQUIRED_VERSION "" CACHE STRING "The specific Python version you want to link to (Optional)")
+mark_as_advanced(Python_REQUIRED_VERSION)
+if(Python_REQUIRED_VERSION)
+  find_package(Python ${Python_REQUIRED_VERSION} EXACT COMPONENTS Interpreter Development REQUIRED)
+else()
+  find_package(Python COMPONENTS Interpreter Development REQUIRED)
+endif()
 
 set_source_files_properties(
   ../scripting/OpenStudio.i
