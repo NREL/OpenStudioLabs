@@ -2,6 +2,7 @@
 #include <fmt/format.h>
 #include "ScriptEngine.hpp"
 #include "Measure.hpp"
+#include "OSArgument.hpp"
 #include "Runner.hpp"
 #include "Model.hpp"
 #include "DynamicLibrary.hpp"
@@ -61,6 +62,28 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   fmt::print("\nPython measure name: {}\n", python_measure->name());
 #endif
 
+  fmt::print("\n\n========== Computing Arguments ==========\n");
+
+  openstudio::Model modelClone;
+
+#if USE_RUBY_ENGINE
+  std::vector<openstudio::OSArgument> rubyArgs = ruby_measure->arguments(modelClone);
+  openstudio::OSArgumentMap rubyArgMap;
+  for (const auto& arg : rubyArgs) {
+    std::cout << "Ruby arg: " << arg << '\n';
+    rubyArgMap[arg.name()] = arg.clone();
+  }
+#endif
+
+#if USE_PYTHON_ENGINE
+  std::vector<openstudio::OSArgument> pythonArgs = python_measure->arguments(modelClone);
+  openstudio::OSArgumentMap pythonArgMap;
+  for (const auto& arg : pythonArgs) {
+    std::cout << "Python arg: " << arg << '\n';
+    pythonArgMap[arg.name()] = arg.clone();
+  }
+#endif
+
   fmt::print("\n\n========== Running Measures ==========\n");
 
   // Run a mock OpenStudio Workflow
@@ -75,12 +98,12 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
 
 #if USE_RUBY_ENGINE
   fmt::print("ruby_measure->run\n");
-  ruby_measure->run(runner);
+  ruby_measure->run(m, runner, rubyArgMap);
 #endif
 
 #if USE_PYTHON_ENGINE
   fmt::print("python_measure->run\n");
-  python_measure->run(runner);
+  python_measure->run(m, runner, pythonArgMap);
 #endif
 
   fmt::print("Now the model is populated from {}\n", engines);

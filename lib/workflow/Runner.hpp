@@ -1,9 +1,14 @@
 #ifndef OPENSTUDIO_SWIG_RUNNER_HPP
 #define OPENSTUDIO_SWIG_RUNNER_HPP
 
-#include "Model.hpp"
+#include "../model/Model.hpp"
+
+#include <optional>
+#include <map>
 
 namespace openstudio {
+
+class OSArgument;
 
 class Runner
 {
@@ -16,12 +21,10 @@ class Runner
   Runner() = delete;
   Runner(Model model) : model_(std::move(model)) {}
 
-  Model& get_current_model() {
-    return model_;
-  }
+  double getDoubleArgumentValue(const std::string& argument_name, const std::map<std::string, OSArgument>& user_arguments);
 
  private:
-  Model model_;
+  std::optional<Model> model_;
 };
 
 }  // namespace openstudio
