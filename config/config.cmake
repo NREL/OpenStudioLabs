@@ -12,7 +12,7 @@ if(HAVE_UNISTD_H)
 endif()
 
 if(MSVC)
-  target_compile_options(cpp_warning_options INTERFACE /W4 /Werror)
+  target_compile_options(cpp_warning_options INTERFACE /W4 /WX)
 else()
   target_compile_options(cpp_warning_options INTERFACE -Wall -Wextra -Wconversion -Werror -Wno-unused-variable)
   target_compile_options(cpp_compile_options INTERFACE -fPIC)
