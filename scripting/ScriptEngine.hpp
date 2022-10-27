@@ -21,9 +21,7 @@ struct ScriptObject
 class ScriptEngine
 {
  public:
-  ScriptEngine() {
-    registerType<openstudio::Measure*>("openstudio::Measure *");
-  }
+  ScriptEngine() {}
 
   virtual ~ScriptEngine() = default;
   ScriptEngine(const ScriptEngine&) = delete;

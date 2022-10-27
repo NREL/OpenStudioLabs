@@ -21,6 +21,8 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   openstudio::util::DynamicLibrary rubyEngineLib(openstudio::getCurrentModuleDir() / "librubyengine.so");
   const std::function<ScriptEngineFactoryType> rubyFactory = rubyEngineLib.load_symbol<ScriptEngineFactoryType>("makeScriptEngine");
   const std::unique_ptr<openstudio::ScriptEngine> rubyEngine(rubyFactory(argc, argv));
+  rubyEngine->registerType<openstudio::Measure*>("openstudio::Measure *");
+
   // Ruby works too!
   rubyEngine->exec(R"(puts("Hello from Ruby"))");
 #endif
@@ -32,6 +34,7 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   openstudio::util::DynamicLibrary pythonEngineLib(openstudio::getCurrentModuleDir() / "libpythonengine.so");
   const std::function<ScriptEngineFactoryType> pythonFactory = pythonEngineLib.load_symbol<ScriptEngineFactoryType>("makeScriptEngine");
   const std::unique_ptr<openstudio::ScriptEngine> pythonEngine(pythonFactory(argc, argv));
+  pythonEngine->registerType<openstudio::Measure*>("openstudio::Measure *");
   // Python works!
   pythonEngine->exec(R"(print("Hello From Python"))");
 #endif
