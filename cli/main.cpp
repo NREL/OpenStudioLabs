@@ -18,7 +18,7 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   engines += ", RubyEngine";
   fmt::print("Initializing the RubyEngine\n");
   // Load and construct the RUBY engine on demand using dynamic loading (e.g. dlopen)
-  openstudio::util::DynamicLibrary rubyEngineLib(openstudio::getCurrentModuleDir() / "librubyengine.so");
+  openstudio::util::DynamicLibrary rubyEngineLib(openstudio::getCurrentModuleDir() / getSharedModuleName("rubyengine"));
   const std::function<ScriptEngineFactoryType> rubyFactory = rubyEngineLib.load_symbol<ScriptEngineFactoryType>("makeScriptEngine");
   const std::unique_ptr<openstudio::ScriptEngine> rubyEngine(rubyFactory(argc, argv));
   rubyEngine->registerType<openstudio::Measure*>("openstudio::Measure *");
@@ -31,7 +31,7 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   engines += ", PythonEngine";
   fmt::print("Initializing the PythonEngine\n");
   // Load and construct the PYTHON engine on demand using dynamic loading (e.g. dlopen)
-  openstudio::util::DynamicLibrary pythonEngineLib(openstudio::getCurrentModuleDir() / "libpythonengine.so");
+  openstudio::util::DynamicLibrary pythonEngineLib(openstudio::getCurrentModuleDir() / getSharedModuleName("pythonengine"));
   const std::function<ScriptEngineFactoryType> pythonFactory = pythonEngineLib.load_symbol<ScriptEngineFactoryType>("makeScriptEngine");
   const std::unique_ptr<openstudio::ScriptEngine> pythonEngine(pythonFactory(argc, argv));
   pythonEngine->registerType<openstudio::Measure*>("openstudio::Measure *");

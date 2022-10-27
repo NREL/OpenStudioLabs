@@ -1,10 +1,22 @@
 #include <filesystem>
+#include <string_view>
 
-std::filesystem::path sourceDir() {
+inline std::filesystem::path sourceDir() {
   return "${PROJECT_SOURCE_DIR}";
 }
 
-std::filesystem::path binaryDir() {
+inline std::filesystem::path binaryDir() {
   return "${PROJECT_BINARY_DIR}";
 }
 
+inline std::string_view getSharedModuleSuffix() {
+  return "${CMAKE_SHARED_MODULE_SUFFIX}";
+}
+
+inline std::string_view getSharedModulePrefix() {
+  return "${CMAKE_SHARED_MODULE_PREFIX}";
+}
+
+inline std::string getSharedModuleName(std::string_view basename) {
+  return fmt::format("{}{}{}", getSharedModulePrefix(), basename, getSharedModuleSuffix());
+}
