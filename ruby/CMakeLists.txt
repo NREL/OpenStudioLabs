@@ -14,7 +14,9 @@ set_target_properties(rubybindings
   SWIG_USE_TARGET_INCLUDE_DIRECTORIES ON
 )
 
-set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/OpenStudioRUBY_wrap.cxx" PROPERTIES COMPILE_FLAGS "-Wno-unused-variable" )
+if (UNIX)
+  set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/OpenStudioRUBY_wrap.cxx" PROPERTIES COMPILE_FLAGS "-Wno-unused-variable" )
+endif()
 
 target_link_libraries(
   rubybindings
@@ -46,6 +48,15 @@ target_link_libraries(
   rubyengine
   PRIVATE CONAN_PKG::openstudio_ruby rubybindings cpp_compile_options
 )
+
+if(WIN32)
+  target_link_libraries(rubyengine
+    PRIVATE
+    wsock32 ws2_32 Dbghelp Shlwapi Iphlpapi
+  )
+
+  target_link_options(rubyengine PRIVATE $<$<CONFIG:Debug>:/NODEFAULTLIB:MSVCRT>)
+endif()
 
 if (APPLE)
   find_library(COREFOUNDATION_LIBRARY CoreFoundation)
