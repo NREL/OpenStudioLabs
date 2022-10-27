@@ -21,7 +21,7 @@ jobs:
         - os: ubuntu-20.04
           PLATFORM_NAME: Linux
           BINARY_EXT: run
-        - os: macos-latest
+        - os: macos-11
           PLATFORM_NAME: Darwin
           BINARY_EXT: dmg
         - os: windows-latest
