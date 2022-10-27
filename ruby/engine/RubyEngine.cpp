@@ -69,14 +69,14 @@ void RubyEngine::exec(std::string_view sv) {
 
 // convert the underlying object to the correct type, then return it as a void *
 // so the above template function can provide it back to the caller.
-void* RubyEngine::getAs_impl(ScriptObject& obj, const std::type_info &ti) {
+void* RubyEngine::getAs_impl(ScriptObject& obj, const std::type_info& ti) {
   auto val = std::any_cast<VALUE>(obj.object);
 
-  const auto &type_name = getRegisteredTypeName(ti);
+  const auto& type_name = getRegisteredTypeName(ti);
 
-  void *return_value = nullptr;
+  void* return_value = nullptr;
 
-  auto *type = SWIG_TypeQuery(type_name.c_str());
+  auto* type = SWIG_TypeQuery(type_name.c_str());
 
   if (!type) {
     throw std::runtime_error("Unable to find type in SWIG");
@@ -91,12 +91,13 @@ void* RubyEngine::getAs_impl(ScriptObject& obj, const std::type_info &ti) {
   return return_value;
 }
 
-} // namespace openstudio
+}  // namespace openstudio
 
-extern "C" {
-openstudio::ScriptEngine* makeScriptEngine([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
-  return new openstudio::RubyEngine();
-}
+extern "C"
+{
+  openstudio::ScriptEngine* makeScriptEngine([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
+    return new openstudio::RubyEngine();
+  }
 }
 
 //extern "C"
