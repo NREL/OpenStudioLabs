@@ -19,7 +19,7 @@ class Runner
   Runner(Runner&&) = delete;
   Runner(const Runner&) = delete;
   Runner() = delete;
-  Runner(Model model) : model_(std::move(model)) {}
+  explicit Runner(Model model) : model_(std::move(model)) {}
 
   double getDoubleArgumentValue(const std::string& argument_name, const std::map<std::string, OSArgument>& user_arguments);
 

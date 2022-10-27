@@ -21,7 +21,7 @@ double Runner::getDoubleArgumentValue(const std::string& argument_name, const st
     ss << " Full argument as passed in by user:" << '\n' << it->second;
   }
   throw std::runtime_error(ss.str());
-  return 0.0;
+  // return 0.0;
 }
 
 }  // namespace openstudio

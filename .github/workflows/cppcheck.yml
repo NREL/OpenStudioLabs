@@ -32,6 +32,7 @@ jobs:
       run: |
           cppcheck \
             --std=c++20 \
+            --suppress=useStlAlgorithm \
             --inline-suppr \
             --enable=all \
             --template='[{file}:{line}]:({severity}),[{id}],{message}' \
