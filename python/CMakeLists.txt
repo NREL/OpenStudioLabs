@@ -24,10 +24,14 @@ swig_add_library(
   SOURCES ../scripting/OpenStudio.i
 )
 
+target_compile_options(pythonbindings PRIVATE
+  "$<${is_msvc_genex}:/wd4996>"
+  "$<${is_gnu_or_clang_genex}:-Wno-deprecated-declarations>"
+)
+
 set_target_properties(pythonbindings
   PROPERTIES
   SWIG_USE_TARGET_INCLUDE_DIRECTORIES ON
-  SWIG_GENERATED_COMPILE_OPTIONS "$<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:-Wno-deprecated-declarations>"
 )
 
 target_include_directories(
@@ -65,7 +69,10 @@ add_library(
 
 target_include_directories(pythonengine INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/engine)
 target_include_directories(pythonengine PRIVATE ${PROJECT_BINARY_DIR})
-
+target_compile_options(pythonengine PRIVATE
+  "$<${is_msvc_genex}:/wd4996>"
+  "$<${is_gnu_or_clang_genex}:-Wno-deprecated-declarations>"
+)
 target_link_libraries(
   pythonengine
   PRIVATE pythonbindings openstudiolib Python::Python cpp_compile_options CONAN_PKG::zlib
