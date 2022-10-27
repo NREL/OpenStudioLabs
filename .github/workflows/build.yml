@@ -112,7 +112,7 @@ jobs:
       run: |
         echo "Using vcvarsall to initialize the development environment"
         call vcvarsall.bat x64
-        cmake -G Ninja -DCMAKE_BUILD_TYPE:STRING=Debug ^
+        cmake -G Ninja -DCMAKE_BUILD_TYPE:STRING=Release ^
               -DUSE_PYTHON_ENGINE:BOOL=ON -DUSE_RUBY_ENGINE:BOOL=ON ^
               -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} ^
               -DPython_ROOT_DIR:PATH=${{ env.Python_ROOT_DIR }} ^

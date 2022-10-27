@@ -7,7 +7,7 @@
 #  pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #endif
 
-#  include <Python.h>
+#include <Python.h>
 
 #include "OpenStudioPYTHON_wrap.cxx"
 #include "embedded_files.hxx"
