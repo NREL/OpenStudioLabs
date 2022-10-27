@@ -7,13 +7,7 @@
 #  pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #endif
 
-#ifdef _DEBUG
-#  undef _DEBUG
 #  include <Python.h>
-#  define _DEBUG
-#else
-#  include <Python.h>
-#endif
 
 #include "OpenStudioPYTHON_wrap.cxx"
 #include "embedded_files.hxx"
