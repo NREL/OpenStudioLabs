@@ -8,17 +8,21 @@
 #endif
 
 #include <Python.h>
-#include "OpenStudioPYTHON_wrap.cxx"
+#include "SWIGPythonRuntime.hxx"
 #include "embedded_files.hxx"
 
 #ifdef __GNUC__
 #  pragma GCC diagnostic pop
 #endif
 
+extern "C" {
+PyObject* PyInit__pythonbindings(void);
+}
+
 namespace openstudio {
 
-PythonEngine::PythonEngine([[maybe_unused]] const int argc, const char* argv[]) : program(Py_DecodeLocale("python3.7", nullptr)) {
-  PyImport_AppendInittab("_pythonbindings", SWIG_init);
+PythonEngine::PythonEngine([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) : program(Py_DecodeLocale("python3.7", nullptr)) {
+  PyImport_AppendInittab("_pythonbindings", PyInit__pythonbindings);
 
   Py_SetProgramName(program);  // optional but recommended
 

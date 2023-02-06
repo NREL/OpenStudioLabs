@@ -27,6 +27,11 @@ set_target_properties(pythonbindings
   SWIG_USE_TARGET_INCLUDE_DIRECTORIES ON
 )
 
+target_compile_definitions(pythonbindings PUBLIC -DSWIG_LINK_RUNTIME)
+#target_compile_definitions(pythonbindings PUBLIC -DSTATIC_LINKED)
+
+set_target_properties(pythonbindings PROPERTIES COMPILE_WARNING_AS_ERROR OFF)
+
 target_include_directories(
   pythonbindings 
   INTERFACE ${CMAKE_CURRENT_BINARY_DIR}
@@ -35,7 +40,7 @@ target_include_directories(
 
 target_link_libraries(
   pythonbindings
-  PRIVATE openstudiolib
+  PRIVATE openstudiolib cpp_compile_options
 )
 
 set (EXTENSION_PY "${CMAKE_CURRENT_BINARY_DIR}/openstudio.py")
@@ -50,6 +55,14 @@ embed_files("${FILES}" "${EMBEDDED_PATHS}" EMBEDDED_OUTPUT)
 set_source_files_properties(${EMBED_SOURCE_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 source_group(embedded_files FILES ${EMBEDDED_OUTPUT})
 
+add_custom_command(
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/SWIGPythonRuntime.hxx"
+  COMMAND
+  ${CMAKE_COMMAND} -E env SWIG_LIB="${SWIG_DIR}" "${SWIG_EXECUTABLE}" "-v"
+  "-python" -external-runtime
+  "${CMAKE_CURRENT_BINARY_DIR}/SWIGPythonRuntime.hxx"
+)
+
 add_library(
   pythonengine
   SHARED
@@ -58,6 +71,7 @@ add_library(
   ${EMBEDDED_OUTPUT}
   "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.cxx"
   "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.hxx"
+  "${CMAKE_CURRENT_BINARY_DIR}/SWIGPythonRuntime.hxx"
 )
 
 target_include_directories(pythonengine INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/engine)

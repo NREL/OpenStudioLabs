@@ -46,7 +46,7 @@ conan_cmake_run(REQUIRES
   "zlib/1.2.12#3b9e037ae1c615d045a06c67d88491ae"
   "minizip/1.2.12#0b5296887a2558500d0323c6c94c8d02"
   "fmt/7.0.1#0580b1492b1dddb43b1768e68f25c43c"
-  "swig/4.0.2#bfafb16cd2bea6af3b8003163abcbd09"
+  #"swig/4.0.2#bfafb16cd2bea6af3b8003163abcbd09"
   BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS
   BUILD missing
   # Passes `-u, --update`    to conan install: Check updates exist from upstream remotes

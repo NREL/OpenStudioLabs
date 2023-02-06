@@ -5,6 +5,8 @@ add_library(model OBJECT
   Model.cpp
   ModelObject.hpp 
   ModelObject.cpp
+  PyRbyTypes.hpp
+  PyRbyTypes.cpp
 )
 
 target_include_directories(model INTERFACE ./)

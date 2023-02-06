@@ -14,7 +14,7 @@ namespace openstudio {
       std::stringstream ss;
 
       ss << "{" << std::endl;
-      for (const auto mo: objects) {
+      for (const auto &mo: objects) {
         ss << mo.toString() << "," << std::endl;
       }
       ss << "}" << std::endl;

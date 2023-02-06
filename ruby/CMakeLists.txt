@@ -14,12 +14,15 @@ set_target_properties(rubybindings
   SWIG_USE_TARGET_INCLUDE_DIRECTORIES ON
 )
 
-set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/OpenStudioRUBY_wrap.cxx" PROPERTIES COMPILE_FLAGS "-Wno-unused-variable" )
-
 target_link_libraries(
   rubybindings
   PRIVATE CONAN_PKG::openstudio_ruby openstudiolib cpp_compile_options
 )
+
+target_compile_definitions(pythonbindings PUBLIC -DSWIG_LINK_RUNTIME)
+#target_compile_definitions(pythonbindings PUBLIC -DSTATIC_LINKED)
+
+set_target_properties(rubybindings PROPERTIES COMPILE_WARNING_AS_ERROR OFF)
 
 add_custom_command(
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/SWIGRubyRuntime.hxx"

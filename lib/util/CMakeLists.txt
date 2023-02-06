@@ -10,7 +10,9 @@ add_library(utilities OBJECT
 
 target_include_directories(utilities INTERFACE ./)
 
-target_link_libraries(utilities PRIVATE
+target_link_libraries(utilities 
+  PRIVATE
+  ${CMAKE_DL_LIBS}
   cpp_warning_options
   cpp_compile_options
 )

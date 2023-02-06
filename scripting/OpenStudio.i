@@ -37,11 +37,15 @@
   #include <Model.hpp>
   #include <Runner.hpp>
   #include <Measure.hpp>
+  #include <PyRbyTypes.hpp>
 %}
 
 %include <ModelObject.hpp>
 %include <Model.hpp>
 %include <Runner.hpp>
 %include <Measure.hpp>
+%include <PyRbyTypes.hpp>
+
+%template(BarVector) std::vector<Bar>;
 
 #endif //WORKFLOW_I
