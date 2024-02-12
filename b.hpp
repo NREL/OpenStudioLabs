@@ -16,9 +16,9 @@ private:
   B() = default;
 };
 
-class B_EXPORT SingleB {
+class SingleB {
 public:
-  static B &instance() {
+  B_EXPORT static B &instance() {
     if (!b) {
       b = std::shared_ptr<B>(new B());
     }
@@ -28,7 +28,7 @@ public:
   static std::shared_ptr<B> b;
 };
 
-void PrintAddressB();
+B_EXPORT void PrintAddressB();
 
 } // namespace b
 

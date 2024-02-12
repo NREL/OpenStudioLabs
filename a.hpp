@@ -16,9 +16,9 @@ private:
   A() = default;
 };
 
-class A_EXPORT SingleA {
+class SingleA {
 public:
-  static A &instance() {
+  A_EXPORT static A &instance() {
     if (!a) {
       a = std::shared_ptr<A>(new A());
     }
