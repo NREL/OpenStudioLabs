@@ -12,6 +12,9 @@ class SingleA;
 class A_EXPORT A {
   friend class SingleA;
 
+public:
+  static int value;
+
 private:
   A() = default;
 };
