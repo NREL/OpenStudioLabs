@@ -7,19 +7,25 @@
 
 namespace a {
 
-class A_EXPORT SingleA {
-public:
-  static SingleA &instance() {
-    if (!single_a) {
-      single_a = std::shared_ptr<SingleA>(new SingleA());
-    }
-    return *single_a;
-  }
+class SingleA;
 
-  static std::shared_ptr<SingleA> single_a;
+class A_EXPORT A {
+  friend class SingleA;
 
 private:
-  SingleA() = default;
+  A() = default;
+};
+
+class A_EXPORT SingleA {
+public:
+  static A &instance() {
+    if (!a) {
+      a = std::shared_ptr<A>(new A());
+    }
+    return *a;
+  }
+
+  static std::shared_ptr<A> a;
 };
 
 A_EXPORT void PrintAddressA();

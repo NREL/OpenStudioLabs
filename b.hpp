@@ -1,24 +1,31 @@
 #ifndef DLLDEMO_B_HPP
 #define DLLDEMO_B_HPP
 
+#include <b_export.h>
 #include <iostream>
 #include <memory>
 
 namespace b {
 
-class SingleB {
-public:
-  static SingleB &instance() {
-    if (!single_b) {
-      single_b = std::shared_ptr<SingleB>(new SingleB());
-    }
-    return *single_b;
-  }
+class SingleB;
 
-  static std::shared_ptr<SingleB> single_b;
+class B_EXPORT B {
+  friend class SingleB;
 
 private:
-  SingleB() = default;
+  B() = default;
+};
+
+class B_EXPORT SingleB {
+public:
+  static B &instance() {
+    if (!b) {
+      b = std::shared_ptr<B>(new B());
+    }
+    return *b;
+  }
+
+  static std::shared_ptr<B> b;
 };
 
 void PrintAddressB();

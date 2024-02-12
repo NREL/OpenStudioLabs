@@ -2,7 +2,7 @@
 
 namespace b {
 
-std::shared_ptr<SingleB> SingleB::single_b;
+std::shared_ptr<B> SingleB::b;
 
 void PrintAddressB() {
   std::cout << "SingleB's instance is located at: " << &(b::SingleB::instance())
