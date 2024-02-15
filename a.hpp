@@ -31,9 +31,11 @@ public:
   static std::shared_ptr<A> a;
 };
 
+extern "C" {
 A_EXPORT void PrintAddressA();
 
 A_EXPORT void PrintAddressB();
+}
 
 } // namespace a
 

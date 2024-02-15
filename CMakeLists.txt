@@ -1,4 +1,9 @@
 project(Demo)
+set(CMAKE_CXX_STANDARD 20)
+
+include(CheckIncludeFile)
+include(CheckIncludeFileCXX)
+check_include_file("unistd.h" HAVE_UNISTD_H)
 
 include(GenerateExportHeader)
 
@@ -22,4 +27,8 @@ add_executable(demo
   main.cpp
 )
 
-target_link_libraries(demo PRIVATE a b)
+target_link_libraries(demo PRIVATE a b ${CMAKE_DL_LIBS})
+
+if(HAVE_UNISTD_H)
+  target_compile_definitions(demo PUBLIC "-DHAVE_UNISTD_H")
+endif()

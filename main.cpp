@@ -1,9 +1,12 @@
+#include "DynamicLibrary.hpp"
 #include "a.hpp"
 #include "b.hpp"
+#include "path.hpp"
+
+#include <filesystem>
 #include <iostream>
 
 int main(int argc, char *argv[]) {
-
   std::cout << "SingleA's instance is located at: " << &(a::SingleA::instance())
             << std::endl;
 
@@ -22,9 +25,13 @@ int main(int argc, char *argv[]) {
 
   b::SingleB::instance().value = 1;
 
-  a::PrintAddressB();
+  DynamicLibrary lib_a(EXEPath().parent_path() / DLLFilename("a"));
 
-  b::PrintAddressB();
+  const auto print_address_a = lib_a.load_symbol<void()>("PrintAddressA");
+  print_address_a();
+
+  const auto print_address_b = lib_a.load_symbol<void()>("PrintAddressB");
+  print_address_b();
 
   return 0;
 }
