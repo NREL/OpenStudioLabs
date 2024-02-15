@@ -22,9 +22,9 @@
 
 #endif
 
-#else
-
-#define DLLDEMO_API
-#define DLLDEMO_TEMPLATE_EXT
+// #else
+//
+// #define DLLDEMO_API
+// #define DLLDEMO_TEMPLATE_EXT
 
 #endif
