@@ -25,7 +25,7 @@ inline std::filesystem::path EXEPath() {
 #if _WIN32
     TCHAR szPath[MAX_PATH];
     GetModuleFileName(nullptr, szPath, MAX_PATH);
-    return std::filesystem : path(szPath);
+    return std::filesystem::path(szPath);
 #else
     // if /proc/self/exe exists, this should be our best option
     std::array<char, PATH_MAX + 1> buf{};

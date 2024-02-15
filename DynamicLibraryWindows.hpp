@@ -20,9 +20,6 @@
 #  include <windows.h>
 #endif
 
-#include <fmt/format.h>
-
-namespace openstudio {
 
 struct DynamicLibrary
 {
@@ -77,16 +74,16 @@ struct DynamicLibrary
     const auto symbol = reinterpret_cast<Signature*>(GetProcAddress(m_handle, name.c_str()));
 
     if (symbol == nullptr) {
-      throw std::runtime_error(fmt::format("Unable to load symbol: '{}', reason: '{}'", name, get_error_message(GetLastError())));
+      throw std::runtime_error(get_error_message(GetLastError()));
     }
 
     return symbol;
   }
 
-  explicit DynamicLibrary(openstudio::path location)
+  explicit DynamicLibrary(std::filesystem::path location)
     : m_location{std::move(location)}, m_handle{LoadLibrary(to_proper_string(m_location.string()).c_str())} {
     if (!m_handle) {
-      throw std::runtime_error(fmt::format("Unable to load library '{}', reason: '{}'", m_location.string(), get_error_message(GetLastError())));
+      throw std::runtime_error(get_error_message(GetLastError()));
     }
   }
 
@@ -110,9 +107,8 @@ struct DynamicLibrary
     }
   }
 
-  openstudio::path m_location{};
+  std::filesystem::path m_location{};
   HMODULE m_handle{};
 };
 
-}  // namespace openstudio
 #endif  // dynamiclibrary_windows_hpp_INCLUDED
