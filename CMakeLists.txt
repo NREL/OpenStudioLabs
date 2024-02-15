@@ -13,6 +13,7 @@ add_library(b SHARED
 )
 generate_export_header(b)
 target_include_directories(b PUBLIC ${PROJECT_BINARY_DIR})
+target_compile_definitions(b PUBLIC "-DDLLDEMO_EXPORTS")
 
 add_library(a SHARED
   a.hpp
@@ -20,6 +21,7 @@ add_library(a SHARED
 )
 generate_export_header(a)
 target_include_directories(a PUBLIC ${PROJECT_BINARY_DIR})
+target_compile_definitions(a PUBLIC "-DDLLDEMO_EXPORTS")
 
 target_link_libraries(a PRIVATE b)
 

@@ -4,7 +4,7 @@
 namespace a {
 
 // std::shared_ptr<A> SingleA::a;
-int A::value = 0;
+// int A::value = 0;
 
 void PrintAddressA() {
   std::cout << "SingleA's instance is located at: " << &(a::SingleA::instance())
