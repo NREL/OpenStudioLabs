@@ -3,7 +3,7 @@
 
 namespace a {
 
-std::shared_ptr<A> SingleA::a;
+// std::shared_ptr<A> SingleA::a;
 int A::value = 0;
 
 void PrintAddressA() {

@@ -2,7 +2,7 @@
 
 namespace b {
 
-std::shared_ptr<B> SingleB::b;
+// std::shared_ptr<B> SingleB::b;
 int B::value = 0;
 
 void PrintAddressB() {

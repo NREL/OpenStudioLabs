@@ -22,13 +22,16 @@ private:
 class SingleB {
 public:
   B_EXPORT static B &instance() {
-    if (!b) {
-      b = std::shared_ptr<B>(new B());
-    }
-    return *b;
+    static B b;
+    return b;
+
+    // if (!b) {
+    //   b = std::shared_ptr<B>(new B());
+    // }
+    // return *b;
   }
 
-  static std::shared_ptr<B> b;
+  // static std::shared_ptr<B> b;
 };
 
 B_EXPORT void PrintAddressB();

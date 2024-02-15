@@ -22,13 +22,15 @@ private:
 class SingleA {
 public:
   A_EXPORT static A &instance() {
-    if (!a) {
-      a = std::shared_ptr<A>(new A());
-    }
-    return *a;
+    static A a;
+    return a;
+    // if (!a) {
+    //   a = std::shared_ptr<A>(new A());
+    // }
+    // return *a;
   }
 
-  static std::shared_ptr<A> a;
+  // static std::shared_ptr<A> a;
 };
 
 extern "C" {
