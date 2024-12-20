@@ -11,6 +11,7 @@
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wregister"
 #  pragma GCC diagnostic ignored "-Wunused-parameter"
+#  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 #include "SWIGRubyRuntime.hxx"
 
@@ -21,6 +22,22 @@
 // TODO: We need to revisit this static initialization stuff
 static int argc = 0;
 static char** argv = nullptr;
+
+extern "C"
+{
+  // static void Init_builtin_prelude(void);
+  // void Init_builtin_gem_prelude(void);
+  struct ruby_cmdline_options;
+  typedef struct ruby_cmdline_options ruby_cmdline_options_t;
+  void Init_ruby_description(ruby_cmdline_options_t*);
+
+  void ruby_gc_set_params(void);
+  // cf https://bugs.ruby-lang.org/issues/19758
+  // I've included the ext/extinit.o and enc/encinit.o in the object files to that should work
+  void Init_enc(void);
+  void Init_ext(void);
+  void rb_call_builtin_inits(void);
+}
 
 unsigned init() {
   ruby_sysinit(&argc, &argv);
@@ -34,6 +51,34 @@ namespace openstudio {
 
 RubyEngine::RubyEngine(int argc, char* argv[]) : ScriptEngine(argc, argv) {
   ruby_set_argv(argc, argv);
+
+  // Init_ruby_description(nullptr);
+
+  // ruby_gc_set_params();
+  // TODO! build with enable-relative!
+  ruby_init_loadpath();
+  //rb_eval_string(R"ruby(
+  //$LOAD_PATH=[
+  //"/home/julien/Software/Others/OpenStudioLabs/build-debug/Products/ruby_lib/ruby/site_ruby/3.2.0",
+  //"/home/julien/Software/Others/OpenStudioLabs/build-debug/Products/ruby_lib/ruby/site_ruby/3.2.0/x86_64-linux",
+  //"/home/julien/Software/Others/OpenStudioLabs/build-debug/Products/ruby_lib/ruby/site_ruby",
+  //"/home/julien/Software/Others/OpenStudioLabs/build-debug/Products/ruby_lib/ruby/vendor_ruby/3.2.0",
+  //"/home/julien/Software/Others/OpenStudioLabs/build-debug/Products/ruby_lib/ruby/vendor_ruby/3.2.0/x86_64-linux",
+  //"/home/julien/Software/Others/OpenStudioLabs/build-debug/Products/ruby_lib/ruby/vendor_ruby",
+  //"/home/julien/Software/Others/OpenStudioLabs/build-debug/Products/ruby_lib/ruby/3.2.0",
+  //"/home/julien/Software/Others/OpenStudioLabs/build-debug/Products/ruby_lib/ruby/3.2.0/x86_64-linux"
+  //]
+
+  //)ruby");
+
+  // Init_enc();
+  // rb_enc_set_default_internal(rb_enc_from_encoding(rb_utf8_encoding()));
+  // rb_enc_set_default_external(rb_enc_from_encoding(rb_utf8_encoding()));
+
+  // Init_ext(); /* load statically linked extensions before rubygems */
+  // Init_extra_exts();
+  // rb_call_builtin_inits();
+
   openstudio::ruby::init();
 }
 

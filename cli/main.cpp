@@ -62,6 +62,12 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   fmt::print("\nPython measure name: {}\n", python_measure->name());
 #endif
 
+#if USE_RUBY_ENGINE
+  fmt::print("Require BIGDECIMAL\n");
+  rubyEngine->exec("puts \"LOAD_PATH='#{$LOAD_PATH}'\"");
+  rubyEngine->exec("puts require 'bigdecimal'");
+#endif
+
   fmt::print("\n\n========== Running Measures ==========\n");
 
   // Run a mock OpenStudio Workflow
