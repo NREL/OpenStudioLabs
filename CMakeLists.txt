@@ -17,9 +17,24 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+
+find_package(Ruby 3.2.2 EXACT REQUIRED)
+message("Ruby_LIBRARIES=${Ruby_LIBRARIES}")
+
+find_package(Python 3.12.2 EXACT REQUIRED COMPONENTS Interpreter Development OPTIONAL_COMPONENTS NumPy)
+
+# Conan
+find_package(minizip)
+find_package(ZLIB)
+find_package(fmt)
+find_package(SWIG 4.1.1 EXACT REQUIRED CONFIG COMPONENTS python ruby csharp)
+message("SWIG_EXECUTABLE=${SWIG_EXECUTABLE}")
+message("SWIG_DIR=${SWIG_DIR}")
+include(UseSWIG)
+
 # Subprojects
 add_subdirectory(scripting)
-add_subdirectory(embedded)
+# add_subdirectory(embedded)
 add_subdirectory(lib)
 add_subdirectory(python)
 add_subdirectory(ruby)

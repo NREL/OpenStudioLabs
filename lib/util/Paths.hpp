@@ -3,11 +3,15 @@
 
 #include <filesystem>
 
+namespace fs = std::filesystem;
+
 namespace openstudio {
 
-std::filesystem::path getCurrentModulePath();
+using path = std::filesystem::path;
 
-std::filesystem::path getCurrentModuleDir();
+openstudio::path getCurrentModulePath();
+
+openstudio::path getCurrentModuleDir();
 
 }  // namespace openstudio
 

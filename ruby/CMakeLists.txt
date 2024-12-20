@@ -15,13 +15,14 @@ set_target_properties(rubybindings
 )
 
 if (UNIX)
-  set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/OpenStudioRUBY_wrap.cxx" PROPERTIES COMPILE_FLAGS "-Wno-unused-variable" )
+  set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/OpenStudioRUBY_wrap.cxx" PROPERTIES COMPILE_FLAGS "-Wno-unused-variable -Wno-deprecated-declarations" )
 endif()
 
 target_link_libraries(
   rubybindings
-  PRIVATE CONAN_PKG::openstudio_ruby openstudiolib cpp_compile_options
+  PRIVATE openstudiolib cpp_compile_options
 )
+target_include_directories(rubybindings SYSTEM PRIVATE ${Ruby_INCLUDE_DIRS})
 
 add_custom_command(
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/SWIGRubyRuntime.hxx"
@@ -47,10 +48,11 @@ target_include_directories(
 target_link_libraries(
   rubyengine
   PRIVATE
-    CONAN_PKG::openstudio_ruby
+    ${Ruby_LIBRARIES}
     rubybindings
     cpp_compile_options
 )
+target_include_directories(rubyengine SYSTEM PRIVATE ${Ruby_INCLUDE_DIRS})
 
 target_compile_definitions(rubyengine PRIVATE openstudio_scriptengine_EXPORTS SHARED_OS_LIBS)
 

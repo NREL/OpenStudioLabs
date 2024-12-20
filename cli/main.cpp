@@ -55,6 +55,7 @@ int main([[maybe_unused]] const int argc, [[maybe_unused]] const char* argv[]) {
   // This will be abstracted into a function (e.g. loadMeasure(...))
   const auto pythonMeasurePath = sourceDir() / "python/measures";
   pythonEngine->exec(fmt::format("import sys\nsys.path.append('{}')", pythonMeasurePath.string()));
+  fmt::print("\npythonMeasurePath: {}\n", pythonMeasurePath.generic_string());
   pythonEngine->exec("import test_measure");
   auto python_measure_pointer = pythonEngine->eval("test_measure.PythonTestMeasure()");
   auto* python_measure = pythonEngine->getAs<openstudio::Measure*>(python_measure_pointer);

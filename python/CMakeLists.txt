@@ -18,9 +18,9 @@ set_source_files_properties(
 )
 
 swig_add_library(
-  pythonbindings TYPE STATIC
+  pythonbindings TYPE SHARED
   LANGUAGE python
-  OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}
+  OUTPUT_DIR ${CMAKE_BINARY_DIR}/Products
   SOURCES ../scripting/OpenStudio.i
 )
 
@@ -52,23 +52,25 @@ foreach( _FILE ${EXTENSION_PY} )
   list(APPEND EMBEDDED_PATHS "python/${LOCATION}")
 endforeach()
 
-include(../embedded/EmbedFiles.cmake)
-embed_files("${FILES}" "${EMBEDDED_PATHS}" EMBEDDED_OUTPUT)
-set_source_files_properties(${EMBED_SOURCE_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
-source_group(embedded_files FILES ${EMBEDDED_OUTPUT})
+# include(../embedded/EmbedFiles.cmake)
+# embed_files("${FILES}" "${EMBEDDED_PATHS}" EMBEDDED_OUTPUT)
+# set_source_files_properties(${EMBED_SOURCE_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
+# source_group(embedded_files FILES ${EMBEDDED_OUTPUT})
 
 add_library(
   pythonengine
   SHARED
   engine/PythonEngine.hpp
   engine/PythonEngine.cpp
-  ${EMBEDDED_OUTPUT}
-  "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.cxx"
-  "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.hxx"
+  #${EMBEDDED_OUTPUT}
+  #"${CMAKE_CURRENT_BINARY_DIR}/embedded_files.cxx"
+  #"${CMAKE_CURRENT_BINARY_DIR}/embedded_files.hxx"
 )
 
 target_include_directories(pythonengine INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/engine)
 target_include_directories(pythonengine PRIVATE ${PROJECT_BINARY_DIR})
+target_include_directories(pythonengine PRIVATE ${PROJECT_BINARY_DIR}/Products)
+
 target_compile_options(pythonengine PRIVATE
   "$<${is_msvc_genex}:/wd4996>"
   "$<${is_gnu_or_clang_genex}:-Wno-deprecated-declarations>"
@@ -80,7 +82,6 @@ target_link_libraries(
 	openstudiolib
 	Python::Python
 	cpp_compile_options
-	CONAN_PKG::zlib
 )
 
 target_compile_definitions(pythonengine PRIVATE openstudio_scriptengine_EXPORTS SHARED_OS_LIBS)

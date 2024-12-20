@@ -22,5 +22,5 @@ target_link_libraries(
     config
     scripting
     cpp_compile_options
-    CONAN_PKG::fmt
+    fmt::fmt
 )

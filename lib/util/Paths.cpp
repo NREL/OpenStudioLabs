@@ -36,6 +36,8 @@ std::filesystem::path getCurrentModulePath() {
   }
 #endif
 
+  path = std::filesystem::absolute(path);
+
   return path;
 }
 

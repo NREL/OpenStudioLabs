@@ -3,7 +3,7 @@
 add_library(cpp_warning_options INTERFACE)
 add_library(cpp_compile_options INTERFACE)
 
-target_compile_features(cpp_compile_options INTERFACE cxx_std_17)
+target_compile_features(cpp_compile_options INTERFACE cxx_std_20)
 
 include(CheckIncludeFile)
 check_include_file("unistd.h" HAVE_UNISTD_H)

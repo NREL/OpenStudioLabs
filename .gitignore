@@ -3,6 +3,7 @@ build*/
 
 .vs/
 CMakeSettings.json
+CMakeUserPresets.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
